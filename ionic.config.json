@@ -1,0 +1,7 @@
+{
+  "name": "NewQueue",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
