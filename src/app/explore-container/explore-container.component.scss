@@ -1,10 +1,13 @@
 :host {
   .container {
     text-align: center;
-
     left: 0;
     right: 0;
-    top: 50%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: flex-end;
   }
 
   .container strong {
