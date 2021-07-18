@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 //import * as joe from "spotify-api";
 
 @Component({
@@ -13,6 +13,7 @@ export class Tab2Page {
   private readonly query = 'q';
   private readonly type = 'type';
   private readonly limit = 'limit';
+  private readonly offset = 'offset';
   private readonly queue_endpoint = 'https://api.spotify.com/v1/me/player/queue?';
   private readonly uri = 'uri';
   private readonly devices_endpoint = 'https://api.spotify.com/v1/me/player/devices';
@@ -21,57 +22,57 @@ export class Tab2Page {
   public loadingToggle: boolean;
   public time: Date;
 
-  constructor(private http: HttpClient, private alertController: AlertController) {}
+  constructor(private http: HttpClient, private alertController: AlertController, private loadingController: LoadingController) {}
 
-  onEnter(ev: any) {
+  searchTrackBy(index, track:SpotifyApi.TrackObjectFull) {
+    return track.id;
+  }
+
+  onTyping(ev: any) {
     //console.log(((ev as KeyboardEvent).target as HTMLInputElement).value);
     const q = ev.target.value;
 
-    this.searchToggle = false;
-    this.loadingToggle = true;
-    this.search(q).subscribe((searchResults) => {
-      this.list(searchResults);
-      this.loadingToggle = false;
-      this.searchToggle = true;
-    });
-    //setTimeout(() => {
-
-    //}, 3000);
+    if (q != '') {
+      this.loading();
+      this.tracks = new Array<SpotifyApi.TrackObjectFull>();
+      for (let i = 0; i < 10*50; i+= 50) {
+        this.search(q, i).subscribe((searchResults) => {
+          searchResults.tracks.items.forEach((track) => this.tracks.push(track));
+          //this.tracks = searchResults.tracks.items;
+          if (i > 10*49) {
+            this.loadingToggle = false;
+          }
+        });
+      }
+      console.log("toggle false");
+    }
   }
 
-  list(searchResults: SpotifyApi.TrackSearchResponse) {
-    console.log(searchResults);
-    this.tracks = searchResults.tracks.items;
-    this.tracks.forEach((track: SpotifyApi.TrackObjectFull) => {
-      //track.album.images[2].url
+  //This is going to be immediately deleted but this is how loading works
+  async loading() {
+    
+    const loading = await this.loadingController.create({
+      cssClass: 'my-custom-class',
+      message: 'Please wait...',
     });
+    await loading.present();
   }
 
-  search(q: string) {
+  search(q: string, i: number) {
     let params = new HttpParams()
     .set(this.query, q)
     .set(this.type, 'track')
-    .set(this.limit, '50');
+    .set(this.limit, '50')
+    .set(this.offset, i);
 
-    const bearer = 'Bearer ' + localStorage.getItem("access_token");
-    const headers = { "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": bearer};
-
+    const headers = this.headers();
     return this.http.get<SpotifyApi.TrackSearchResponse>(this.search_endpoint + params, {headers});
-
-    // const track = this.searchResults.tracks.items[0].uri;
-    // this.queue(track);
   }
 
   async queue(track: SpotifyApi.TrackObjectFull) {
     console.log(track.uri);
 
-    const bearer = 'Bearer ' + localStorage.getItem("access_token");
-    const headers = { "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": bearer};
-
+    const headers = this.headers();
     this.http.get<any>(this.devices_endpoint, {headers}).subscribe(async (devicesResponse: SpotifyApi.UserDevicesResponse) => {
       if (devicesResponse.devices.length > 0) {
         let params = new HttpParams()
@@ -98,5 +99,14 @@ export class Tab2Page {
     });
 
     await alert.present();
+  }
+
+  headers(): any {
+    const bearer = 'Bearer ' + localStorage.getItem("access_token");
+    const headers = { "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": bearer};
+
+    return headers;
   }
 }

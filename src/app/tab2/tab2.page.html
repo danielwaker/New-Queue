@@ -13,17 +13,16 @@
     </ion-toolbar>
   </ion-header>
   <app-explore-container name="Search Page"></app-explore-container>
-  <ion-input (keyup.enter)="onEnter($event)" class="search">
+  <ion-input (ionInput)="onTyping($event)" class="search">
     <ion-icon class="search-icon" name="search-outline"></ion-icon>
   </ion-input>
   <div>
-    <ion-list *ngIf="searchToggle">
-      <ion-item *ngFor="let track of tracks" button (click)="queue(track)">
+    <ion-list *ngIf="tracks && tracks.length > 0">
+      <ion-item *ngFor="let track of tracks; index as i; trackBy: searchTrackBy" button (click)="queue(track)">
         <img [src]="track.album.images[2].url"/>
         <div class="track-name">{{track.name}}</div>
         <div class="track-time">{{track.duration_ms | date:'m:ss'}}</div>
       </ion-item>
     </ion-list>
-    <ion-spinner *ngIf="loadingToggle"></ion-spinner>
   </div>
 </ion-content>
