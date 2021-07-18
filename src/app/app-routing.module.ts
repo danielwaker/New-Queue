@@ -11,6 +11,10 @@ const routes: Routes = [
     path: 'callback',
     component: CallbackComponent,
     canActivate: [CallbackComponent]
+  },
+  {
+    path: 'login',
+    loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
   }
 ];
 @NgModule({

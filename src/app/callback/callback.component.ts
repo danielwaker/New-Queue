@@ -41,6 +41,12 @@ export class CallbackComponent implements OnInit, CanActivate {
       console.log("value: " + value);
       console.log("key: " + key);
     });
+
+    var expiration = new Date();
+    expiration.setSeconds(new Date().getSeconds() + +localStorage.getItem("expires_in"));
+    console.log(expiration.getTime());
+    localStorage.setItem("expiration", expiration.getTime().toString());
+    
     console.log(token);
     console.log(test);
     this.auth.Authenticated();

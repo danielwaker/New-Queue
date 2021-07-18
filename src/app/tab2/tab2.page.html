@@ -12,14 +12,13 @@
       <ion-title size="large">Tab 2</ion-title>
     </ion-toolbar>
   </ion-header>
-
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+  <app-explore-container name="Search Page"></app-explore-container>
   <ion-input (keyup.enter)="onEnter($event)" class="search">
     <ion-icon class="search-icon" name="search-outline"></ion-icon>
   </ion-input>
   <div>
     <ion-list *ngIf="searchToggle">
-      <ion-item *ngFor="let track of tracks">
+      <ion-item *ngFor="let track of tracks" button (click)="queue(track)">
         <img [src]="track.album.images[2].url"/>
         <div class="track-name">{{track.name}}</div>
         <div class="track-time">{{track.duration_ms | date:'m:ss'}}</div>
