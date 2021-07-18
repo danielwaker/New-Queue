@@ -1,0 +1,39 @@
+:host {
+    .search {
+        border: solid red;
+        border-radius: 1rem;
+        --padding-start: 0.25rem;
+        --padding-end: 1rem;
+
+        .search-icon {
+            height: 1.5rem;
+            width: 1.5rem;
+            padding-left: 0.5rem;
+        }
+    }
+
+    .track-name {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .track-time {
+        margin-left: auto;
+    }
+
+    ion-spinner {
+        width: 100%;
+        margin-top: 1rem;
+        height: 3rem;
+    }
+
+    ion-list {
+        overflow: scroll;
+        height: 15rem;
+    }
+
+    img {
+        padding: 0.5rem;
+    }
+}
