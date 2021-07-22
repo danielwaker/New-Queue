@@ -6,13 +6,12 @@
   </ion-toolbar>
   <ion-toolbar>
     <ion-item class="search">
-      <ion-input (ionInput)="onTyping($event)" >
-        <ion-icon class="search-icon" name="search-outline"></ion-icon>
-        <ion-label item-end>
-
-        </ion-label>
+      <ion-input #inputText (ionInput)="onTyping($event)">
+        <ion-icon button class="search-icon" name="search-outline"></ion-icon>
       </ion-input>
-      <ion-icon class="x-icon" name="close-circle-outline" item-end></ion-icon>
+      <ion-button fill="clear" (click)="clear(inputText)">
+        <ion-icon class="x-icon" name="close-circle-outline"></ion-icon>
+      </ion-button>
     </ion-item>
 
   </ion-toolbar>

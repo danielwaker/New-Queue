@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { AlertController, IonInput, LoadingController, ToastController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 //import * as joe from "spotify-api";
 
@@ -45,13 +45,14 @@ export class Tab2Page {
   async onTyping(ev: any) {
     //console.log(((ev as KeyboardEvent).target as HTMLInputElement).value);
     const q: string = ev.target.value;
-
+    console.log(q);
     if (q.length > 0) {
       this.q = q;
       this.tracks = await this.search(q, 0);
     }
     else {
-      
+      // due to await you can't necessary clear it without some workaround
+      this.tracks = null;
     }
   }
 
@@ -120,5 +121,11 @@ export class Tab2Page {
     "Authorization": bearer};
 
     return headers;
+  }
+
+  clear(inputText: IonInput) {
+    inputText.value = ''; 
+    inputText.setFocus();
+    this.tracks = null;
   }
 }
