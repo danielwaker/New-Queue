@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 })
 export class Tab3Page {
   private readonly devices_endpoint = 'https://api.spotify.com/v1/me/player/devices';
+  public log;
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -18,12 +19,21 @@ export class Tab3Page {
     "Content-Type": "application/json",
     "Authorization": bearer};
 
-    this.http.get<any>(this.devices_endpoint, {headers}).subscribe((data) => {
+    this.http.get<any>(this.devices_endpoint, {headers}).subscribe((data: SpotifyApi.UserDevicesResponse) => {
       console.log(data);
+      this.log = '';
+      data.devices.forEach((device: SpotifyApi.UserDevice) => {
+        this.log += `Name: ${device.name} \n Type: ${device.type} \n ID: ${device.id} \n Active: ${device.is_active}`;
+      });
     });
   }
 
   loginPage() {
-    this.router.navigate(['/login']);
+    this.router.navigateByUrl('/login');
+  }
+
+  copyToClipboard() {
+    //this.navigator.clipboard.writeText(this.log);
+    navigator.clipboard.writeText(this.log);
   }
 }

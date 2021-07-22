@@ -10,6 +10,10 @@
             width: 1.5rem;
             padding-left: 0.5rem;
         }
+
+        .x-icon {
+
+        }
     }
 
     .track-name {
@@ -28,9 +32,23 @@
         height: 3rem;
     }
 
-    ion-list {
+    // ion-list {
+    //     overflow: scroll;
+    //     height: 12rem;
+    // }
+    
+    // ion-infinite-scroll {
+    //     overflow: scroll;
+    //     height: 12rem;
+    // }
+
+    ion-item.item-interactive.item-has-focus {
+        --highlight-color-focused: none; //no blue underline in search bar
+    }
+
+    .scroll-wrap {
         overflow: scroll;
-        height: 15rem;
+        height: 12rem !important;
     }
 
     img {

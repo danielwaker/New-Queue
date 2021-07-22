@@ -17,6 +17,11 @@
   <div class="buttons">
     <ion-button (click)="devices()">Get Devices</ion-button>
     <ion-button (click)="loginPage()">Login Page</ion-button>
+    <ion-card button *ngIf="log" (click)="copyToClipboard()">
+      <ion-card-content>
+        {{log}}
+      </ion-card-content>
+    </ion-card>
   </div>
 
 </ion-content>

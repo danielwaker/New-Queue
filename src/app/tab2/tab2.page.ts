@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { Observable } from 'rxjs';
 //import * as joe from "spotify-api";
 
 @Component({
@@ -13,14 +14,16 @@ export class Tab2Page {
   private readonly query = 'q';
   private readonly type = 'type';
   private readonly limit = 'limit';
-  private readonly offset = 'offset';
+  private readonly offset_ = 'offset';
   private readonly queue_endpoint = 'https://api.spotify.com/v1/me/player/queue?';
   private readonly uri = 'uri';
   private readonly devices_endpoint = 'https://api.spotify.com/v1/me/player/devices';
   public tracks: SpotifyApi.TrackObjectFull[];
-  public searchToggle: boolean;
-  public loadingToggle: boolean;
   public time: Date;
+  public searchQueries = 1;
+  public offset = 0;
+  public q = '';
+  public bounds = 10;
 
   constructor(private http: HttpClient, private alertController: AlertController, private loadingController: LoadingController) {}
 
@@ -28,42 +31,51 @@ export class Tab2Page {
     return track.id;
   }
 
-  onTyping(ev: any) {
-    //console.log(((ev as KeyboardEvent).target as HTMLInputElement).value);
-    const q = ev.target.value;
+  itemHeightFn(item, index) {
+    return 81;
+  }
 
-    if (q != '') {
-      this.loading();
-      this.tracks = new Array<SpotifyApi.TrackObjectFull>();
-      for (let i = 0; i < 10*50; i+= 50) {
-        this.search(q, i).subscribe((searchResults) => {
-          searchResults.tracks.items.forEach((track) => this.tracks.push(track));
-          //this.tracks = searchResults.tracks.items;
-          if (i > 10*49) {
-            this.loadingToggle = false;
-          }
-        });
-      }
-      console.log("toggle false");
+  async loadData(ev: any) {
+    console.log("load");
+    this.offset += 2;
+    this.tracks.push(...await this.search(this.q, this.offset));
+    ev.target.complete();
+  }
+
+  async onTyping(ev: any) {
+    //console.log(((ev as KeyboardEvent).target as HTMLInputElement).value);
+    const q: string = ev.target.value;
+
+    if (q.length > 0) {
+      this.q = q;
+      this.tracks = await this.search(q, 0);
+    }
+    else {
+      
     }
   }
 
-  //This is going to be immediately deleted but this is how loading works
-  async loading() {
-    
-    const loading = await this.loadingController.create({
-      cssClass: 'my-custom-class',
-      message: 'Please wait...',
+  search(q, offset): Promise<SpotifyApi.TrackObjectFull[]> {
+    return new Promise((resolve, reject) => {
+      const tracks = new Array<SpotifyApi.TrackObjectFull>();
+      for (let i = offset*50; i < (this.searchQueries+offset)*50; i+= 50) {
+        this.searchQuery(q, i).subscribe((searchResults) => {
+          searchResults.tracks.items.forEach((track) => tracks.push(track));
+  
+          if (i >= (this.searchQueries+offset - 1)*50) {
+            resolve(tracks);
+          }
+        });
+      }
     });
-    await loading.present();
   }
 
-  search(q: string, i: number) {
+  searchQuery(q: string, i: number) {
     let params = new HttpParams()
     .set(this.query, q)
     .set(this.type, 'track')
     .set(this.limit, '50')
-    .set(this.offset, i);
+    .set(this.offset_, i);
 
     const headers = this.headers();
     return this.http.get<SpotifyApi.TrackSearchResponse>(this.search_endpoint + params, {headers});
