@@ -15,9 +15,11 @@ export class Tab3Page {
 
   devices() {
     const bearer = 'Bearer ' + localStorage.getItem("access_token");
-    const headers = { "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": bearer};
+    const headers = { 
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": bearer
+    };
 
     this.http.get<any>(this.devices_endpoint, {headers}).subscribe((data: SpotifyApi.UserDevicesResponse) => {
       console.log(data);
@@ -33,7 +35,17 @@ export class Tab3Page {
   }
 
   copyToClipboard() {
-    //this.navigator.clipboard.writeText(this.log);
     navigator.clipboard.writeText(this.log);
+  }
+
+  backend() {
+    const headers = {
+      // 'Access-Control-Allow-Origin' : '*',
+      // 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,DELETE,PUT'
+    }
+    this.http.get<any>('https://localhost:44397/WeatherForecast/', {headers}).subscribe(data => {
+      console.log(data);
+      this.log = data;
+    });
   }
 }
