@@ -9,7 +9,14 @@ import { Router } from '@angular/router';
 })
 export class Tab3Page {
   private readonly devices_endpoint = 'https://api.spotify.com/v1/me/player/devices';
+  // public testLogs = {
+  //   log: '',
+  //   backendLog: '',
+  //   image: ''
+  // }
   public log;
+  public backendLog;
+  public image;
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -21,11 +28,11 @@ export class Tab3Page {
       "Authorization": bearer
     };
 
+    this.log = '';
     this.http.get<any>(this.devices_endpoint, {headers}).subscribe((data: SpotifyApi.UserDevicesResponse) => {
       console.log(data);
-      this.log = '';
       data.devices.forEach((device: SpotifyApi.UserDevice) => {
-        this.log += `Name: ${device.name} \n Type: ${device.type} \n ID: ${device.id} \n Active: ${device.is_active}`;
+        this.log += `Name: ${device.name} \nType: ${device.type} \nID: ${device.id} \nActive: ${device.is_active}`;
       });
     });
   }
@@ -43,9 +50,26 @@ export class Tab3Page {
       // 'Access-Control-Allow-Origin' : '*',
       // 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,DELETE,PUT'
     }
-    this.http.get<any>('https://localhost:44397/WeatherForecast/', {headers}).subscribe(data => {
+    this.log = '';
+    this.http.get<any>('https://localhost:44397/WeatherForecast/', {headers}).subscribe((data) => {
       console.log(data);
-      this.log = data;
+      this.backendLog = data;
+    }, (error) => {
+      console.log(error);
+      this.backendLog = error;
+    });
+  }
+
+  getQR() {
+    const headers = {
+      // 'Access-Control-Allow-Origin' : '*',
+      // 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,DELETE,PUT'
+      'Accept': 'text/plain',
+      'Content-Type': 'text/plain'
+    }
+    this.http.get('https://localhost:44397/Queue/CreateSession/', {headers, responseType: 'text'}).subscribe((data) => {
+      console.log(data);
+      this.image = 'data:image/jpeg;base64,' + data;
     });
   }
 }
