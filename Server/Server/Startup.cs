@@ -53,6 +53,7 @@ namespace Server
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server v1"));
+                AppDomain.CurrentDomain.SetData("ContentRootPath", env.ContentRootPath);
             }
 
             app.UseHttpsRedirection();

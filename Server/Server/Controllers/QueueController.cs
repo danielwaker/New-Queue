@@ -8,6 +8,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Server.Controllers
@@ -20,9 +21,10 @@ namespace Server.Controllers
         public string CreateSession()
         {
             string sessionID = SessionID();
-            string sessionQR = SessionQR();
-            string url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
-            return sessionQR;
+            string url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}?sessionID={sessionID}";
+            string sessionQR = SessionQR(url);
+            
+            return SessionData(sessionID);
         }
 
         /// <summary>
@@ -36,10 +38,10 @@ namespace Server.Controllers
             return session.ToString(fmt);
         }
 
-        private string SessionQR()
+        private string SessionQR(string url)
         {
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode($"{Request.Scheme}://{Request.Host}{Request.PathBase}", QRCodeGenerator.ECCLevel.Q);
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
             QRCode qrCode = new QRCode(qrCodeData);
             Image img = qrCode.GetGraphic(20);
             using (var stream = new MemoryStream())
@@ -49,17 +51,21 @@ namespace Server.Controllers
             }
         }
 
-        private void SessionData(string sessionID)
+        private string SessionData(string sessionID)
         {
-            string path = @"..\Sessions\" + sessionID + ".json";
+            string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
+            string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
+            Console.WriteLine(path);
             // Create the file, or overwrite if the file exists.
             using (FileStream fs = System.IO.File.Create(path))
             {
-                byte[] info = new UTF8Encoding(true).GetBytes("This is some text in the file.");
+                Session hi = new Session(sessionID, "joe");
+                string jsonString = JsonSerializer.Serialize(hi);
+                byte[] info = new UTF8Encoding(true).GetBytes(jsonString);
                 // Add some information to the file.
                 fs.Write(info, 0, info.Length);
             }
-
+            return path;
             // Open the stream and read it back.
             /*using (StreamReader sr = System.IO.File.OpenText(path))
             {
