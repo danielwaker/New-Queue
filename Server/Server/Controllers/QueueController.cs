@@ -18,13 +18,17 @@ namespace Server.Controllers
     public class QueueController : ControllerBase
     {
         [HttpGet("CreateSession")]
-        public string CreateSession(string user)
+        public object CreateSession(string user)
         {
             string sessionID = SessionID();
             string url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}?sessionID={sessionID}";
             string sessionQR = SessionQR(url);
             CreateSessionData(sessionID, user);
-            return sessionQR;
+            return new
+            {
+                sessionID = sessionID,
+                sessionQR = sessionQR
+            };
         }
 
         /// <summary>

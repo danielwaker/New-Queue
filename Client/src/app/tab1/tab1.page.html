@@ -14,4 +14,10 @@
   </ion-header>
 
   <app-explore-container class="container" name="Front Page"></app-explore-container>
+  <div class="buttons">
+    <ion-button (click)="createSession()">Create Session</ion-button>
+    <div *ngIf="qrUrl">
+      <img [src]="qrUrl"/>
+    </div>
+  </div>
 </ion-content>

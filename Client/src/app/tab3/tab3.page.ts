@@ -59,24 +59,4 @@ export class Tab3Page {
       this.backendLog = error;
     });
   }
-
-  createSession() {
-    const bearer = 'Bearer ' + localStorage.getItem("access_token");
-    const headers = { "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": bearer};
-    
-    this.http.get<any>('https://api.spotify.com/v1/me', {headers}).subscribe((data: SpotifyApi.UserProfileResponse) => {
-      console.log(data);
-      this.log = data.uri;
-      const user = 'joe';
-      const params = {
-        user: user
-      };
-      this.http.get('https://localhost:44397/Queue/CreateSession/',  { params, responseType: 'text'}).subscribe((data) => {
-        console.log(data);
-        this.image = 'data:image/jpeg;base64,' + data;
-      });
-    });
-  }
 }
