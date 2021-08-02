@@ -18,13 +18,13 @@ namespace Server.Controllers
     public class QueueController : ControllerBase
     {
         [HttpGet("CreateSession")]
-        public string CreateSession()
+        public string CreateSession(string user)
         {
             string sessionID = SessionID();
             string url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}?sessionID={sessionID}";
             string sessionQR = SessionQR(url);
-            
-            return SessionData(sessionID);
+            CreateSessionData(sessionID, user);
+            return sessionQR;
         }
 
         /// <summary>
@@ -51,21 +51,18 @@ namespace Server.Controllers
             }
         }
 
-        private string SessionData(string sessionID)
+        private void CreateSessionData(string sessionID, string user)
         {
             string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
             string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
-            Console.WriteLine(path);
-            // Create the file, or overwrite if the file exists.
+
             using (FileStream fs = System.IO.File.Create(path))
             {
-                Session hi = new Session(sessionID, "joe");
-                string jsonString = JsonSerializer.Serialize(hi);
-                byte[] info = new UTF8Encoding(true).GetBytes(jsonString);
-                // Add some information to the file.
+                Session hi = new Session(sessionID, user);
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                byte[] info = JsonSerializer.SerializeToUtf8Bytes(hi, options);
                 fs.Write(info, 0, info.Length);
             }
-            return path;
             // Open the stream and read it back.
             /*using (StreamReader sr = System.IO.File.OpenText(path))
             {

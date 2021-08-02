@@ -7,15 +7,17 @@ namespace Server
 {
     public class Session
     {
-        public string sessionID;
-        public List<string> users;
-        public List<string> songs;
+        public string sessionID { get; set; }
+        public string leader { get; set; }
+        public List<string> users { get; set; }
+        public List<string> songs { get; set; }
 
         public Session(string sessionID, string user)
         {
             users = new List<string>();
             songs = new List<string>();
             this.sessionID = sessionID;
+            leader = user;
             users.Add(user);
         }
 

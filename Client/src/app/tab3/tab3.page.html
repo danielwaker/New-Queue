@@ -17,8 +17,8 @@
   <div class="buttons">
     <ion-button (click)="devices()">Get Devices</ion-button>
     <ion-button (click)="loginPage()">Login Page</ion-button>
-    <ion-button (click)="backend()">Backend</ion-button>
-    <ion-button (click)="getQR()">QR</ion-button>
+    <ion-button (click)="backendWeatherForecast()">Backend</ion-button>
+    <ion-button (click)="createSession()">Create Session</ion-button>
     <ion-card button *ngIf="log || backendLog" (click)="copyToClipboard()">
       <ion-card-content>
         <div *ngIf="log.length > 0; else errorBlock">{{log}}</div>
