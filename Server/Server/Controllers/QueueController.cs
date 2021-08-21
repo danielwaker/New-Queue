@@ -72,13 +72,31 @@ namespace Server.Controllers
         [HttpPost("AddSong")]
         public void AddSong(string sessionID, string user, string uri)
         {
+            Session session = DeserializeSession(sessionID);
+            session.AddSong(user, uri);
+            ReserializeSession(sessionID, session);
+        }
+
+        [HttpPost("AddUser")]
+        public void AddUser(string sessionID, string user)
+        {
+            Session session = DeserializeSession(sessionID);
+            session.AddUser(user);
+            ReserializeSession(sessionID, session);
+        }
+
+        private Session DeserializeSession(string sessionID)
+        {
             string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
             string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
             var jsonString = System.IO.File.ReadAllText(path);
-            Session session = JsonSerializer.Deserialize<Session>(jsonString);
+            return JsonSerializer.Deserialize<Session>(jsonString);
+        }
 
-            session.AddSong(user, uri);
-
+        private void ReserializeSession(string sessionID, Session session)
+        {
+            string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
+            string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
             using (FileStream fs = System.IO.File.Open(path, FileMode.Open))
             {
                 var options = new JsonSerializerOptions { WriteIndented = true };

@@ -67,7 +67,10 @@ namespace Server
             var yeah = ((System.Text.Json.JsonElement)users[user]).TryGetInt32(out int songCount);
             if (yeah)
             {
-                songs.Insert((songCount + 1) * (users.Count - userIndex), userSong);
+                var songIndex = (songCount + 1) * users.Count + userIndex;
+                if (songIndex > songs.Count)
+                    songIndex = songs.Count;
+                songs.Insert(songIndex, userSong);
                 users[user] = songCount + 1;
             }
         }
