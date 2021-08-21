@@ -10,6 +10,9 @@ import { Observable } from 'rxjs';
   styleUrls: ['tab2.page.scss']
 })
 export class Tab2Page {
+
+  private VIRTUAL_QUEUE_FLAG: boolean = true;
+  
   private readonly search_endpoint = 'https://api.spotify.com/v1/search?';
   private readonly query = 'q';
   private readonly type = 'type';
@@ -82,12 +85,49 @@ export class Tab2Page {
     return this.http.get<SpotifyApi.TrackSearchResponse>(this.search_endpoint + params, {headers});
   }
 
-  async queue(track: SpotifyApi.TrackObjectFull) {
+  queue(track: SpotifyApi.TrackObjectFull) {
+    if (this.VIRTUAL_QUEUE_FLAG) {
+      this.virtualQueue(track);
+    }
+    else {
+      this.spotifyQueue(track);
+    }
+  }
+
+  async virtualQueue(track: SpotifyApi.TrackObjectFull) {
+    const bearer = 'Bearer ' + localStorage.getItem("access_token");
+    const headers = { "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": bearer};
+    
+    const params = {
+      sessionID: localStorage.getItem('sessionId'),
+      user: localStorage.getItem('user'),
+      uri: track.uri,
+      // name: track.name,
+      // artist: track.artists[0].name,
+      // length: track.duration_ms,
+      // art: track.album.images[2].url
+    };
+    console.log(params);
+    const test = this.http.post<any>('https://localhost:44397/Queue/AddSong/', { headers },  { params }).subscribe(data => {
+        console.log(data);
+    });
+    console.log(test);
+  }
+
+  async spotifyQueue(track: SpotifyApi.TrackObjectFull) {
     console.log(track.uri);
 
     const headers = this.headers();
+    let activeDevice = false;
     this.http.get<any>(this.devices_endpoint, {headers}).subscribe(async (devicesResponse: SpotifyApi.UserDevicesResponse) => {
-      if (devicesResponse.devices.length > 0) {
+      devicesResponse.devices.forEach((device: SpotifyApi.UserDevice) => {
+        if (device.is_active) {
+          activeDevice = true;
+        }
+      })
+      if (activeDevice) {
         let params = new HttpParams()
         .set(this.uri, track.uri)
         .set("device_id", devicesResponse.devices[0].id);

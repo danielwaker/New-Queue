@@ -67,15 +67,24 @@ namespace Server.Controllers
                 byte[] info = JsonSerializer.SerializeToUtf8Bytes(hi, options);
                 fs.Write(info, 0, info.Length);
             }
-            // Open the stream and read it back.
-            /*using (StreamReader sr = System.IO.File.OpenText(path))
+        }
+
+        [HttpPost("AddSong")]
+        public void AddSong(string sessionID, string user, string uri)
+        {
+            string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
+            string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
+            var jsonString = System.IO.File.ReadAllText(path);
+            Session session = JsonSerializer.Deserialize<Session>(jsonString);
+
+            session.AddSong(user, uri);
+
+            using (FileStream fs = System.IO.File.Open(path, FileMode.Open))
             {
-                string s = "";
-                while ((s = sr.ReadLine()) != null)
-                {
-                    Console.WriteLine(s);
-                }
-            }*/
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                byte[] info = JsonSerializer.SerializeToUtf8Bytes(session, options);
+                fs.Write(info, 0, info.Length);
+            }
         }
     }
 }

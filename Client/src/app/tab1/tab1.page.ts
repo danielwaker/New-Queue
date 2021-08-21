@@ -29,15 +29,16 @@ export class Tab1Page {
     
     this._http.get<any>('https://api.spotify.com/v1/me', {headers}).subscribe((data: SpotifyApi.UserProfileResponse) => {
       console.log(data);
-      this.userId = data.uri;
-      const user = 'joe';
+      const user = data.uri;
       const params = {
         user: user
       };
+      localStorage.setItem('user', user);
       this._http.get('https://localhost:44397/Queue/CreateSession/',  { params }).subscribe((data: CreateSession) => {
         console.log(data);
         this.qrUrl = 'data:image/jpeg;base64,' + data.sessionQR;
-        this.sessionId = data.sessionID;
+        const sessionId = data.sessionID;
+        localStorage.setItem('sessionId', sessionId);
       });
     });
   }
