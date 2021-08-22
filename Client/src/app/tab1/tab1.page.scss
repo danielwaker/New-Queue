@@ -5,8 +5,35 @@
         align-items: center;
     }
 
-    img {
+    .qr {
         height: 10rem;
         width: 10rem;
+    }
+
+    .track {
+        display: flex;
+    }
+
+    .track-user {
+        writing-mode: vertical-lr;
+        transform: rotate(180deg);
+    }
+
+    .track-data {
+        display: contents;
+    }
+
+    .track-name {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .track-time {
+        margin-left: auto;
+    }
+
+    .track-cover {
+        padding: 0.5rem;
     }
 }

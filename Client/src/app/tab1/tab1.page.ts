@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { CreateSession } from '../interfaces';
+import { CreateSession, Song } from '../interfaces';
 import * as signalR from '@microsoft/signalr';  
 
 @Component({
@@ -13,36 +13,50 @@ export class Tab1Page {
   public qrUrl;
   public userId;
   public sessionId;
+  public connection: signalR.HubConnection;
+  public queue: [SpotifyApi.TrackObjectFull, string][];
 
   constructor(private _http: HttpClient) {
     
    }
 
   ngOnInit() {
-    const connection = new signalR.HubConnectionBuilder()  
+    this.connection = new signalR.HubConnectionBuilder()  
       .configureLogging(signalR.LogLevel.Information)  
       .withUrl('https://localhost:44397/' + 'notify')  
-      .build();  
+      .build();
   
-    connection.start().then(function () {  
+    this.connection.start().then(() => {  
       console.log('SignalR Connected!');  
     }).catch(function (err) {  
       return console.error(err.toString());  
     });  
   
-    connection.on("BroadcastMessage", () => {  
+    this.connection.on("BroadcastMessage", () => {  
       console.log("Notification");
       this.getQueue();
     });  
   }
 
   getQueue() {
+    const bearer = 'Bearer ' + localStorage.getItem("access_token");
+    const headers = { "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": bearer};
     const params = {
       sessionID: localStorage.getItem('sessionId')
     };
     console.log(params);
-    const test = this._http.get('https://localhost:44397/Queue/GetQueue/', { params }).subscribe(data => {
-        console.log(data);
+    this._http.get('https://localhost:44397/Queue/GetQueue/', { params }).subscribe((data: Song[]) => {
+      this.queue = [];
+      data.forEach(song => {
+        if (song.uri != null) {
+          this._http.get('https://api.spotify.com/v1/tracks/' + song.uri, { headers }).subscribe((data: SpotifyApi.TrackObjectFull) => {
+            this.queue.push([data, song.user]);
+          });
+        }
+      });
+      console.log(data);
     });
   }
 
@@ -54,9 +68,10 @@ export class Tab1Page {
     
     this._http.get<any>('https://api.spotify.com/v1/me', {headers}).subscribe((data: SpotifyApi.UserProfileResponse) => {
       console.log(data);
-      const user = data.uri;
+      const user = data.display_name;
       const params = {
-        user: user
+        user: user,
+        connectionID: this.connection.connectionId
       };
       localStorage.setItem('user', user);
       this._http.get('https://localhost:44397/Queue/CreateSession/',  { params }).subscribe((data: CreateSession) => {
@@ -67,5 +82,10 @@ export class Tab1Page {
       });
     });
   }
+
+  randomColor(): string {
+    return '#' + Math.floor(Math.random()*16777215).toString(16);
+  } 
+
 
 }

@@ -24,12 +24,13 @@ namespace Server.Controllers
             _hubContext = hubContext;
         }
         [HttpGet("CreateSession")]
-        public object CreateSession(string user)
+        public object CreateSession(string user, string connectionID)
         {
             string sessionID = SessionID();
             string url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}?sessionID={sessionID}";
             string sessionQR = SessionQR(url);
             CreateSessionData(sessionID, user);
+            _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
             return new
             {
                 sessionID = sessionID,
@@ -87,17 +88,18 @@ namespace Server.Controllers
                 Test1 = "test1",
                 Test2 = "test2"
             };
-            await _hubContext.Clients.All.BroadcastMessage();
+            await _hubContext.Clients.Group(sessionID).BroadcastMessage();
 
             return NoContent();
         }
 
         [HttpPost("AddUser")]
-        public void AddUser(string sessionID, string user)
+        public void AddUser(string sessionID, string user, string connectionID)
         {
             Session session = DeserializeSession(sessionID);
             session.AddUser(user);
             ReserializeSession(sessionID, session);
+            _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
         }
 
         [HttpGet("GetQueue")]

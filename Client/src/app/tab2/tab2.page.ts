@@ -103,7 +103,7 @@ export class Tab2Page {
     const params = {
       sessionID: localStorage.getItem('sessionId'),
       user: localStorage.getItem('user'),
-      uri: track.uri,
+      uri: track.id,
       // name: track.name,
       // artist: track.artists[0].name,
       // length: track.duration_ms,
