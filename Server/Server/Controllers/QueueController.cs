@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using QRCoder;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,11 @@ namespace Server.Controllers
     [Route("[controller]")]
     public class QueueController : ControllerBase
     {
+        private readonly IHubContext<BroadcastHub, IHubClient> _hubContext;
+        public QueueController(IHubContext<BroadcastHub, IHubClient> hubContext)
+        {
+            _hubContext = hubContext;
+        }
         [HttpGet("CreateSession")]
         public object CreateSession(string user)
         {
@@ -70,11 +76,20 @@ namespace Server.Controllers
         }
 
         [HttpPost("AddSong")]
-        public void AddSong(string sessionID, string user, string uri)
+        public async Task<IActionResult> AddSong(string sessionID, string user, string uri)
         {
             Session session = DeserializeSession(sessionID);
             session.AddSong(user, uri);
             ReserializeSession(sessionID, session);
+
+            Notification notification = new Notification()
+            {
+                Test1 = "test1",
+                Test2 = "test2"
+            };
+            await _hubContext.Clients.All.BroadcastMessage();
+
+            return NoContent();
         }
 
         [HttpPost("AddUser")]
@@ -83,6 +98,15 @@ namespace Server.Controllers
             Session session = DeserializeSession(sessionID);
             session.AddUser(user);
             ReserializeSession(sessionID, session);
+        }
+
+        [HttpGet("GetQueue")]
+        public List<Song> GetQueue(string sessionID)
+        {
+            Session session = DeserializeSession(sessionID);
+            List<Song> queue = session.GetSongs();
+            ReserializeSession(sessionID, session);
+            return queue;
         }
 
         private Session DeserializeSession(string sessionID)

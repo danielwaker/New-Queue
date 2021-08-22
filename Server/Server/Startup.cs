@@ -38,6 +38,7 @@ namespace Server
                     .AllowAnyHeader()
                     .AllowCredentials());
             });
+            services.AddSignalR();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -63,6 +64,11 @@ namespace Server
             app.UseAuthorization();
 
             app.UseCors("CorsPolicy");
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<BroadcastHub>("/notify");
+            });
 
             app.UseEndpoints(endpoints =>
             {

@@ -84,5 +84,10 @@ namespace Server
             };
             songs.Remove(userSong);
         }
+
+        public List<Song> GetSongs()
+        {
+            return songs;
+        }
     }
 }

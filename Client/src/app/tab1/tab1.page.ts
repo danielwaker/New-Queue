@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { CreateSession } from '../interfaces';
+import * as signalR from '@microsoft/signalr';  
 
 @Component({
   selector: 'app-tab1',
@@ -18,7 +19,31 @@ export class Tab1Page {
    }
 
   ngOnInit() {
+    const connection = new signalR.HubConnectionBuilder()  
+      .configureLogging(signalR.LogLevel.Information)  
+      .withUrl('https://localhost:44397/' + 'notify')  
+      .build();  
+  
+    connection.start().then(function () {  
+      console.log('SignalR Connected!');  
+    }).catch(function (err) {  
+      return console.error(err.toString());  
+    });  
+  
+    connection.on("BroadcastMessage", () => {  
+      console.log("Notification");
+      this.getQueue();
+    });  
+  }
 
+  getQueue() {
+    const params = {
+      sessionID: localStorage.getItem('sessionId')
+    };
+    console.log(params);
+    const test = this._http.get('https://localhost:44397/Queue/GetQueue/', { params }).subscribe(data => {
+        console.log(data);
+    });
   }
 
   createSession() {
