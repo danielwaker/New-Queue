@@ -1,17 +1,26 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Server
 {
+    public class User
+    {
+        public int songs { get; set; }
+        public string color { get; set; }
+    }
+
     public class Song
     {
         public string user { get; set; }
         public string uri { get; set; }
     }
+
     public class Session
     {
         public string sessionID { get; set; }
@@ -32,7 +41,13 @@ namespace Server
 
         public void AddUser(string user)
         {
-            users.Add(user, 0);
+            string color = RandomColor();
+            User userInfo = new User()
+            {
+                color = color,
+                songs = 0
+            };
+            users.Add(user, userInfo);
             Song userSong = new Song()
             {
                 user = user,
@@ -64,15 +79,14 @@ namespace Server
                 user = user,
                 uri = null
             };
-            var yeah = ((System.Text.Json.JsonElement)users[user]).TryGetInt32(out int songCount);
-            if (yeah)
-            {
-                var songIndex = (songCount + 1) * users.Count + userIndex;
-                if (songIndex > songs.Count)
-                    songIndex = songs.Count;
-                songs.Insert(songIndex, userSong);
-                users[user] = songCount + 1;
-            }
+            User userInfo = StupidDeserialization((JsonElement)users[user]);
+            int songCount = userInfo.songs;
+            int songIndex = (songCount + 1) * users.Count + userIndex;
+            if (songIndex > songs.Count)
+                songIndex = songs.Count;
+            songs.Insert(songIndex, userSong);
+            userInfo.songs = songCount + 1;
+            users[user] = userInfo;
         }
 
         public void RemoveSong(string user, string song)
@@ -88,6 +102,28 @@ namespace Server
         public List<Song> GetSongs()
         {
             return songs;
+        }
+
+        public OrderedDictionary GetUsers()
+        {
+            return users;
+        }
+
+        private User StupidDeserialization(JsonElement element)
+        {
+            JsonSerializerOptions options = null;
+            var bufferWriter = new ArrayBufferWriter<byte>();
+            using (var writer = new Utf8JsonWriter(bufferWriter))
+            {
+                element.WriteTo(writer);
+            }
+
+            return JsonSerializer.Deserialize<User>(bufferWriter.WrittenSpan, options);
+        }
+
+        private string RandomColor()
+        {
+            return "#" + Convert.ToString((int)Math.Floor(new Random().NextDouble() * 16777215), 16);
         }
     }
 }

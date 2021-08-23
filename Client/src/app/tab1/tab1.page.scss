@@ -17,6 +17,9 @@
     .track-user {
         writing-mode: vertical-lr;
         transform: rotate(180deg);
+        max-height: 12ch;
+        --inner-padding-end: 0.5rem;
+        --padding-start: 0.5rem;
     }
 
     .track-data {

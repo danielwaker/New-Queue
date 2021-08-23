@@ -32,7 +32,7 @@ export class Tab3Page {
     this.http.get<any>(this.devices_endpoint, {headers}).subscribe((data: SpotifyApi.UserDevicesResponse) => {
       console.log(data);
       data.devices.forEach((device: SpotifyApi.UserDevice) => {
-        this.log += `Name: ${device.name} \nType: ${device.type} \nID: ${device.id} \nActive: ${device.is_active}`;
+        this.log += `Name: ${device.name} \nType: ${device.type} \nID: ${device.id} \nActive: ${device.is_active}\n`;
       });
     });
   }

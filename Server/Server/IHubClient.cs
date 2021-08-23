@@ -4,6 +4,7 @@ namespace Server
 {
     public interface IHubClient
     {
-        Task BroadcastMessage();
+        Task BroadcastQueue();
+        Task BroadcastUsers();
     }
 }

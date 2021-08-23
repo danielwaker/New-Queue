@@ -21,7 +21,7 @@
     <ion-card button *ngIf="log || backendLog" (click)="copyToClipboard()">
       <ion-card-content>
         <div *ngIf="log.length > 0; else errorBlock">{{log}}</div>
-        <ng-template #errorBlock>{{backendLog | json}}joe</ng-template>
+        <ng-template #errorBlock>{{backendLog | json}}</ng-template>
       </ion-card-content>
     </ion-card>
   </div>

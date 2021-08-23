@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using QRCoder;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -88,18 +89,20 @@ namespace Server.Controllers
                 Test1 = "test1",
                 Test2 = "test2"
             };
-            await _hubContext.Clients.Group(sessionID).BroadcastMessage();
+            await _hubContext.Clients.Group(sessionID).BroadcastQueue();
 
             return NoContent();
         }
 
         [HttpPost("AddUser")]
-        public void AddUser(string sessionID, string user, string connectionID)
+        public async Task<IActionResult> AddUser(string sessionID, string user, string connectionID)
         {
             Session session = DeserializeSession(sessionID);
             session.AddUser(user);
             ReserializeSession(sessionID, session);
-            _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
+            await _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
+            await _hubContext.Clients.Group(sessionID).BroadcastUsers();
+            return NoContent();
         }
 
         [HttpGet("GetQueue")]
@@ -109,6 +112,15 @@ namespace Server.Controllers
             List<Song> queue = session.GetSongs();
             ReserializeSession(sessionID, session);
             return queue;
+        }
+
+        [HttpGet("GetUsers")]
+        public OrderedDictionary GetUsers(string sessionID)
+        {
+            Session session = DeserializeSession(sessionID);
+            OrderedDictionary users = session.GetUsers();
+            ReserializeSession(sessionID, session);
+            return users;
         }
 
         private Session DeserializeSession(string sessionID)

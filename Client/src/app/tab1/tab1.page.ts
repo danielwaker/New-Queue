@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { CreateSession, Song } from '../interfaces';
+import { CreateSession, Song, User } from '../interfaces';
 import * as signalR from '@microsoft/signalr';  
 
 @Component({
@@ -15,6 +15,7 @@ export class Tab1Page {
   public sessionId;
   public connection: signalR.HubConnection;
   public queue: [SpotifyApi.TrackObjectFull, string][];
+  public users: Record<string,User>;
 
   constructor(private _http: HttpClient) {
     
@@ -32,9 +33,13 @@ export class Tab1Page {
       return console.error(err.toString());  
     });  
   
-    this.connection.on("BroadcastMessage", () => {  
+    this.connection.on("BroadcastQueue", () => {  
       console.log("Notification");
       this.getQueue();
+    }); 
+    this.connection.on("BroadcastUsers", () => {  
+      console.log("Notification");
+      this.getUsers();
     });  
   }
 
@@ -60,6 +65,17 @@ export class Tab1Page {
     });
   }
 
+  getUsers() {
+    const params = {
+      sessionID: localStorage.getItem('sessionId')
+    };
+    console.log(params);
+    this._http.get('https://localhost:44397/Queue/GetUsers/', { params }).subscribe((data: Record<string,User>) => {
+      this.users = data;
+      console.log(data);
+    });
+  }
+
   createSession() {
     const bearer = 'Bearer ' + localStorage.getItem("access_token");
     const headers = { "Accept": "application/json",
@@ -79,13 +95,12 @@ export class Tab1Page {
         this.qrUrl = 'data:image/jpeg;base64,' + data.sessionQR;
         const sessionId = data.sessionID;
         localStorage.setItem('sessionId', sessionId);
+        this.getUsers();
       });
     });
   }
 
-  randomColor(): string {
-    return '#' + Math.floor(Math.random()*16777215).toString(16);
-  } 
-
-
+  getColor(user: string, el: any) {
+    el.el.style.setProperty('--background', this.users[user].color);
+  }
 }
