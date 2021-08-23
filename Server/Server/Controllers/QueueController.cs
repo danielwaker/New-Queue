@@ -84,13 +84,7 @@ namespace Server.Controllers
             session.AddSong(user, uri);
             ReserializeSession(sessionID, session);
 
-            Notification notification = new Notification()
-            {
-                Test1 = "test1",
-                Test2 = "test2"
-            };
             await _hubContext.Clients.Group(sessionID).BroadcastQueue();
-
             return NoContent();
         }
 
