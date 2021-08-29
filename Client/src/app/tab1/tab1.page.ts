@@ -17,9 +17,7 @@ export class Tab1Page {
   public queue: [SpotifyApi.TrackObjectFull, string][];
   public users: Record<string,User>;
 
-  constructor(private _http: HttpClient) {
-    
-   }
+  constructor(private _http: HttpClient) { }
 
   ngOnInit() {
     this.connection = new signalR.HubConnectionBuilder()  
