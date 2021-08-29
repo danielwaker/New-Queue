@@ -85,6 +85,18 @@ export class Tab2Page {
     return this.http.get<SpotifyApi.TrackSearchResponse>(this.search_endpoint + params, {headers});
   }
 
+  //this is just testing
+  testgetsong(track: SpotifyApi.TrackObjectFull) {
+    const params = {
+      token: localStorage.getItem('access_token'),
+      song: track.id
+    };
+    console.log(params);
+    const test = this.http.get<any>('https://localhost:44397/Queue/GetSong/', { params }).subscribe(data => {
+        console.log(data);
+    });
+  }
+
   queue(track: SpotifyApi.TrackObjectFull) {
     if (this.VIRTUAL_QUEUE_FLAG) {
       this.virtualQueue(track);
@@ -95,10 +107,7 @@ export class Tab2Page {
   }
 
   async virtualQueue(track: SpotifyApi.TrackObjectFull) {
-    const bearer = 'Bearer ' + localStorage.getItem("access_token");
-    const headers = { "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": bearer};
+    const headers = this.headers();
     
     const params = {
       sessionID: localStorage.getItem('sessionId'),

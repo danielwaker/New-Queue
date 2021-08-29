@@ -117,6 +117,14 @@ namespace Server.Controllers
             return users;
         }
 
+        [HttpGet("GetSong")]
+        public async Task<object> GetSong(string token, string song)
+        {
+            var spotify = new SpotifyAPI.Web.SpotifyClient(token);
+            var track = await spotify.Tracks.Get(song);
+            return track;
+        }
+
         private Session DeserializeSession(string sessionID)
         {
             string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
