@@ -14,14 +14,17 @@ export class PlayerComponent implements OnInit {
 
   play() {
     const headers = this.headers(); 
-    this._http.put<any>('https://api.spotify.com/v1/me/player/play', {headers});
+    this._http.put<any>('https://api.spotify.com/v1/me/player/play', {}, { headers }).subscribe(data => {
+      console.log(data);
+    });
   }
   pause() {
     console.log("test");
-    const headers = this.headers(); 
-    this._http.put<any>('https://api.spotify.com/v1/me/player/pause', {headers}).subscribe(data => {
+    const headers = this.headers();
+    const test = this._http.put<any>('https://api.spotify.com/v1/me/player/pause', {}, { headers }).subscribe(data => {
       console.log(data);
     });
+    console.log(test);
   }
 
   headers(): any {

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using QRCoder;
+using SpotifyAPI.Web;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -55,7 +56,7 @@ namespace Server.Controllers
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
             QRCodeData qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
             QRCode qrCode = new QRCode(qrCodeData);
-            Image img = qrCode.GetGraphic(20);
+            System.Drawing.Image img = qrCode.GetGraphic(20);
             using (var stream = new MemoryStream())
             {
                 img.Save(stream, ImageFormat.Png);
@@ -120,9 +121,19 @@ namespace Server.Controllers
         [HttpGet("GetSong")]
         public async Task<object> GetSong(string token, string song)
         {
-            var spotify = new SpotifyAPI.Web.SpotifyClient(token);
+            var spotify = new SpotifyClient(token);
             var track = await spotify.Tracks.Get(song);
             return track;
+        }
+
+        [HttpGet("Callback")]
+        public async Task<IActionResult> Callback(string code, string state)
+        {
+            var response = await new OAuthClient().RequestToken(
+                new AuthorizationCodeTokenRequest("5794ad59a90744c9aba2ca18cd73bc10", "8a1204cb1f0042679933dcd724ab919f", code, new Uri("https://localhost:44397/Queue/Callback")));
+            var spotify = new SpotifyClient(response.AccessToken);
+            var url = $"http://localhost:8100/callback?access_token={response.AccessToken}&token_type={response.TokenType}&expires_in={response.ExpiresIn}";
+            return Redirect(url);
         }
 
         private Session DeserializeSession(string sessionID)

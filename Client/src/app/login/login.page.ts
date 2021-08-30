@@ -11,8 +11,10 @@ import { AuthenicateService } from '../authenicate.service';
 export class LoginPage implements OnInit {
 
   public clientId = '5794ad59a90744c9aba2ca18cd73bc10';
-  public responseType = 'token';
-  public redirectUri = 'http://localhost:8100/callback';
+  public responseTypeToken = 'token';
+  public responseTypeCode = 'code';
+  public redirectUriFront = 'http://localhost:8100/callback';
+  public redirectUriBack = 'https://localhost:44397/Queue/Callback';
   public state = 'secret';
   public scope = "user-modify-playback-state user-read-playback-state user-read-playback-position user-read-private user-read-email playlist-read-private user-library-read user-library-modify user-top-read playlist-read-collaborative playlist-modify-public playlist-modify-private ugc-image-upload user-follow-read user-follow-modify user-modify-playback-state user-read-currently-playing user-read-recently-played";
   public readonly authorizeUrl = 'https://accounts.spotify.com/authorize?';
@@ -48,8 +50,8 @@ export class LoginPage implements OnInit {
   Login() {
     let params = new HttpParams()
     .set(this.client_id, this.clientId)
-    .set(this.response_type, this.responseType)
-    .set(this.redirect_uri, this.redirectUri)
+    .set(this.response_type, this.responseTypeCode)
+    .set(this.redirect_uri, this.redirectUriBack)
     .set(this.state_, this.state)
     .set(this.scope_, this.scope);
     window.location.href = this.authorizeUrl + params.toString();
