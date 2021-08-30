@@ -1,6 +1,14 @@
 <ion-footer>
   <ion-item>
-    <ion-icon button name="play-circle-outline" (click)="play()"></ion-icon>
-    <ion-icon button name="pause-circle-outline" (click)="pause()"></ion-icon>
+    <div *ngIf="currentSong" class="currently-playing">
+      <img [src]="currentSong.album.images[2].url"/>
+      <div class="track-name">{{currentSong.artists[0].name}} - {{currentSong.name}}</div>
+    </div>
+    <ion-icon *ngIf="isPlaying; else elseBlock" button name="pause-circle-outline" (click)="playPause(ePlayPause.pause)"></ion-icon>
+    <ng-template #elseBlock>
+      <ion-icon button name="play-circle-outline" (click)="playPause(ePlayPause.play)"></ion-icon>
+    </ng-template>
+    <ion-icon button name="play-skip-forward-circle-outline" (click)="nextSong()"></ion-icon>
+    <ion-icon name="refresh-circle-outline" button (click)="setCurrentSong()"></ion-icon>
   </ion-item>
 </ion-footer>

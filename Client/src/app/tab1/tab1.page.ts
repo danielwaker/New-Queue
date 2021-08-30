@@ -16,6 +16,7 @@ export class Tab1Page {
   public connection: signalR.HubConnection;
   public queue: [SpotifyApi.TrackObjectFull, string][];
   public users: Record<string,User>;
+  public queueStarted = false;
 
   constructor(private _http: HttpClient) { }
 

@@ -2,4 +2,11 @@
     ion-icon {
         margin: auto;
     }
+    .currently-playing {
+        display: flex;
+        align-items: center;
+    }
+    .track-name {
+        margin: 0 0.5rem;
+    }
 }
