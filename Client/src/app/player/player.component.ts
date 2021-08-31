@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { empty } from 'rxjs';
 
 export enum PlayPause {
   play = 'play',
@@ -15,6 +16,9 @@ export class PlayerComponent implements OnInit {
   public isPlaying;
   public ePlayPause = PlayPause;
   public currentSong: SpotifyApi.TrackObjectFull;
+  public progress: number;
+  public interval: NodeJS.Timeout;
+  public paused = false;
   private playerURL = 'https://api.spotify.com/v1/me/player/';
   constructor(private _http: HttpClient) { }
 
@@ -28,15 +32,34 @@ export class PlayerComponent implements OnInit {
       console.log(playback);
       this.isPlaying = playback.is_playing;
       this.currentSong = playback.item as SpotifyApi.TrackObjectFull;
+      this.progress = playback.progress_ms;
+      if (this.isPlaying) {
+        this.startTimer(this.currentSong.duration_ms, playback.progress_ms);
+      }
     });
+  }
+
+  startTimer(duration: number, progress: number) {
+    this.interval = setInterval(() => {
+      if (this.paused) {
+        let doNothing;
+      } else if ((progress + 1000) < duration) {
+        progress += 1000;
+        this.progress = progress;
+      } else {
+        this.setCurrentSong();
+        clearInterval(this.interval);
+      }
+    },1000)
   }
 
   playPause(playPause: PlayPause) {
     const headers = this.headers(); 
-    this._http.put<any>(this.playerURL + playPause, {}, { headers }).subscribe(data => {
-      console.log(data);
+    this._http.put<any>(this.playerURL + playPause, {}, { headers }).subscribe(() => {
+      this.paused = (playPause == PlayPause.play) ? false : true;
     }, (error) => {
       const flip = (playPause == PlayPause.play) ? PlayPause.pause : PlayPause.play;
+      this.paused = (playPause == PlayPause.play) ? false : true;
       this.playPause(flip);
     });
     this.isPlaying = !this.isPlaying;

@@ -3,6 +3,9 @@
     <ion-title>
       Tab 1
     </ion-title>
+    <ion-buttons *ngIf="users" slot="end">
+      <ion-button (click)="startQueue()">start queue</ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -22,14 +25,19 @@
   </div>
   <div *ngIf="queue && queue.length > 0">
     <ion-list>
-      <span class="track" *ngFor="let track of queue; index as i; trackBy: searchTrackBy">
-        <ion-item #user class="track-user" [ngClass]="getColor(track[1], user)">{{track[1]}}</ion-item>
-        <ion-item class="track-data">
-          <img class="track-cover" [src]="track[0].album.images[2].url"/>
-          <div class="track-name">{{track[0].artists[0].name}} - {{track[0].name}}</div>
-          <div class="track-time">{{track[0].duration_ms | date:'m:ss'}}</div>
+      <ion-item-sliding *ngFor="let track of queue; index as i; trackBy: searchTrackBy">
+        <ion-item>
+          <ion-item #user class="track-user" [ngClass]="getColor(track[1], user)">{{track[1]}}</ion-item>
+          <ion-item class="track-data">
+            <img class="track-cover" [src]="track[0].album.images[2].url"/>
+            <div class="track-name">{{track[0].artists[0].name}} - {{track[0].name}}</div>
+            <div class="track-time">{{track[0].duration_ms | date:'m:ss'}}</div>
+          </ion-item>
         </ion-item>
-      </span>
+        <ion-item-options>
+          <ion-item-option color="success" (click)="removeSong(i)">Delete</ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
     </ion-list>
   </div>
 </ion-content>

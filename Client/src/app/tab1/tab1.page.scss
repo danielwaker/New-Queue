@@ -10,16 +10,16 @@
         width: 10rem;
     }
 
-    .track {
-        display: flex;
-    }
+    // .track {
+    //     display: flex;
+    // }
 
     .track-user {
         writing-mode: vertical-lr;
         transform: rotate(180deg);
-        max-height: 12ch;
-        --inner-padding-end: 0.5rem;
-        --padding-start: 0.5rem;
+        height: 5rem;
+        --inner-padding-end: 0.25rem;
+        --padding-start: 0.25rem;
     }
 
     .track-data {
@@ -38,5 +38,9 @@
 
     .track-cover {
         padding: 0.5rem;
+    }
+
+    ion-item-sliding {
+        //height: 2rem;
     }
 }

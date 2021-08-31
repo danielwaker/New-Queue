@@ -89,14 +89,10 @@ namespace Server
             users[user] = userInfo;
         }
 
-        public void RemoveSong(string user, string song)
+        public void RemoveSong(int songIndex)
         {
-            Song userSong = new Song()
-            {
-                user = user,
-                uri = song
-            };
-            songs.Remove(userSong);
+            songs.RemoveAt(songIndex);
+            songs.Capacity = songs.Capacity - 1;
         }
 
         public List<Song> GetSongs()

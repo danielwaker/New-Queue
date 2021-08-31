@@ -1,6 +1,8 @@
 :host {
     ion-icon {
         margin: auto;
+        width: 2rem;
+        height: 2rem;
     }
     .currently-playing {
         display: flex;
@@ -8,5 +10,17 @@
     }
     .track-name {
         margin: 0 0.5rem;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        width: 15rem;
+    }
+    .track-time {
+        margin-right: 0.5rem;
+    }
+
+    ion-item {
+        --inner-padding-end: 0;
+        --padding-start: 0;
     }
 }

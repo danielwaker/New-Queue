@@ -1,0 +1,24 @@
+{
+  "sessionID": "457144",
+  "leader": "danielwaker",
+  "users": {
+    "danielwaker": {
+      "songs": 3,
+      "color": "#e0b4d"
+    }
+  },
+  "songs": [
+    {
+      "user": "danielwaker",
+      "uri": "6KgtcmCF9Ky68XC7ezxl3s"
+    },
+    {
+      "user": "danielwaker",
+      "uri": "4jDmJ51x1o9NZB5Nxxc7gY"
+    },
+    {
+      "user": "danielwaker",
+      "uri": null
+    }
+  ]
+}

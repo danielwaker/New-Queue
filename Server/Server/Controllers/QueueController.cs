@@ -118,6 +118,14 @@ namespace Server.Controllers
             return users;
         }
 
+        [HttpPost("RemoveSong")]
+        public void RemoveSong(string sessionID, int songIndex)
+        {
+            Session session = DeserializeSession(sessionID);
+            session.RemoveSong(songIndex);
+            ReserializeSession(sessionID, session);
+        }
+
         [HttpGet("GetSong")]
         public async Task<object> GetSong(string token, string song)
         {
@@ -148,7 +156,7 @@ namespace Server.Controllers
         {
             string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
             string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
-            using (FileStream fs = System.IO.File.Open(path, FileMode.Open))
+            using (FileStream fs = System.IO.File.Open(path, FileMode.Create))
             {
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 byte[] info = JsonSerializer.SerializeToUtf8Bytes(session, options);

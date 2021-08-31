@@ -21,6 +21,9 @@ export class Tab1Page {
   constructor(private _http: HttpClient) { }
 
   ngOnInit() {
+    if (localStorage.getItem('sessionId')) {
+      this.getUsers(true);
+    }
     this.connection = new signalR.HubConnectionBuilder()  
       .configureLogging(signalR.LogLevel.Information)  
       .withUrl('https://localhost:44397/' + 'notify')  
@@ -30,16 +33,17 @@ export class Tab1Page {
       console.log('SignalR Connected!');  
     }).catch(function (err) {  
       return console.error(err.toString());  
-    });  
+    });
   
     this.connection.on("BroadcastQueue", () => {  
       console.log("Notification");
       this.getQueue();
-    }); 
+    });
+    
     this.connection.on("BroadcastUsers", () => {  
       console.log("Notification");
       this.getUsers();
-    });  
+    });
   }
 
   getQueue() {
@@ -61,10 +65,11 @@ export class Tab1Page {
         }
       });
       console.log(data);
+      console.log(this.queue);
     });
   }
 
-  getUsers() {
+  getUsers(getQueue: boolean = false) {
     const params = {
       sessionID: localStorage.getItem('sessionId')
     };
@@ -72,6 +77,9 @@ export class Tab1Page {
     this._http.get('https://localhost:44397/Queue/GetUsers/', { params }).subscribe((data: Record<string,User>) => {
       this.users = data;
       console.log(data);
+      if (getQueue) {
+        this.getQueue();
+      }
     });
   }
 
@@ -96,6 +104,17 @@ export class Tab1Page {
         localStorage.setItem('sessionId', sessionId);
         this.getUsers();
       });
+    });
+  }
+
+  removeSong(index: number) {
+    const params = {
+      sessionID: localStorage.getItem('sessionId'),
+      songIndex: index
+    };
+    this._http.post('https://localhost:44397/Queue/RemoveSong/', {}, { params }).subscribe((data) => {
+      console.log(data);
+      this.queue.splice(index, 1);
     });
   }
 
