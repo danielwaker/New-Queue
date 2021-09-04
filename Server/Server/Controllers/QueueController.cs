@@ -137,8 +137,12 @@ namespace Server.Controllers
         [HttpGet("Callback")]
         public async Task<IActionResult> Callback(string code, string state)
         {
+            string baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+            var preUri = string.Concat(baseUrl, "/Queue/Callback");
+            var uri = new Uri(preUri);
+
             var response = await new OAuthClient().RequestToken(
-                new AuthorizationCodeTokenRequest("5794ad59a90744c9aba2ca18cd73bc10", "8a1204cb1f0042679933dcd724ab919f", code, new Uri("https://localhost:44397/Queue/Callback")));
+                new AuthorizationCodeTokenRequest("5794ad59a90744c9aba2ca18cd73bc10", "8a1204cb1f0042679933dcd724ab919f", code, uri));
             var spotify = new SpotifyClient(response.AccessToken);
             var url = $"http://localhost:8100/callback?access_token={response.AccessToken}&token_type={response.TokenType}&expires_in={response.ExpiresIn}";
             return Redirect(url);

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-tab3',
@@ -51,7 +52,7 @@ export class Tab3Page {
       // 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,DELETE,PUT'
     }
     this.log = '';
-    this.http.get<any>('https://localhost:44397/WeatherForecast/', {headers}).subscribe((data) => {
+    this.http.get<any>(environment.apiUrl + 'WeatherForecast/', {headers}).subscribe((data) => {
       console.log(data);
       this.backendLog = data;
     }, (error) => {

@@ -3,6 +3,7 @@ import { Component, ViewChild } from '@angular/core';
 import { CreateSession, Song, User } from '../interfaces';
 import * as signalR from '@microsoft/signalr';  
 import { PlayerComponent } from '../player/player.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-tab1',
@@ -28,7 +29,7 @@ export class Tab1Page {
     }
     this.connection = new signalR.HubConnectionBuilder()  
       .configureLogging(signalR.LogLevel.Information)  
-      .withUrl('https://localhost:44397/' + 'notify')  
+      .withUrl(environment.apiUrl + 'notify')  
       .build();
   
     this.connection.start().then(() => {  
@@ -57,7 +58,7 @@ export class Tab1Page {
       sessionID: localStorage.getItem('sessionId')
     };
     console.log(params);
-    this._http.get('https://localhost:44397/Queue/GetQueue/', { params }).subscribe((data: Song[]) => {
+    this._http.get(environment.apiUrl + 'Queue/GetQueue/', { params }).subscribe((data: Song[]) => {
       this.queue = [];
       data.forEach(song => {
         if (song.uri != null) {
@@ -76,7 +77,7 @@ export class Tab1Page {
       sessionID: localStorage.getItem('sessionId')
     };
     console.log(params);
-    this._http.get('https://localhost:44397/Queue/GetUsers/', { params }).subscribe((data: Record<string,User>) => {
+    this._http.get(environment.apiUrl + 'Queue/GetUsers/', { params }).subscribe((data: Record<string,User>) => {
       this.users = data;
       console.log(data);
       if (getQueue) {
@@ -99,7 +100,7 @@ export class Tab1Page {
         connectionID: this.connection.connectionId
       };
       localStorage.setItem('user', user);
-      this._http.get('https://localhost:44397/Queue/CreateSession/',  { params }).subscribe((data: CreateSession) => {
+      this._http.get(environment.apiUrl + 'Queue/CreateSession/',  { params }).subscribe((data: CreateSession) => {
         console.log(data);
         this.qrUrl = 'data:image/jpeg;base64,' + data.sessionQR;
         const sessionId = data.sessionID;
@@ -155,7 +156,7 @@ export class Tab1Page {
       sessionID: localStorage.getItem('sessionId'),
       songIndex: index
     };
-    this._http.post('https://localhost:44397/Queue/RemoveSong/', {}, { params }).subscribe((data) => {
+    this._http.post(environment.apiUrl + 'Queue/RemoveSong/', {}, { params }).subscribe((data) => {
       console.log(data);
       this.queue.splice(index, 1);
     });

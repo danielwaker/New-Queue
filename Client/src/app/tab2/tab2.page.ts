@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { AlertController, IonInput, LoadingController, ToastController } from '@ionic/angular';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 //import * as joe from "spotify-api";
 
 @Component({
@@ -92,7 +93,7 @@ export class Tab2Page {
       song: track.id
     };
     console.log(params);
-    const test = this.http.get<any>('https://localhost:44397/Queue/GetSong/', { params }).subscribe(data => {
+    const test = this.http.get<any>(environment.apiUrl + 'Queue/GetSong/', { params }).subscribe(data => {
         console.log(data);
     });
   }
@@ -119,7 +120,7 @@ export class Tab2Page {
       // art: track.album.images[2].url
     };
     console.log(params);
-    const test = this.http.post<any>('https://localhost:44397/Queue/AddSong/', { headers },  { params }).subscribe(data => {
+    const test = this.http.post<any>(environment.apiUrl + 'Queue/AddSong/', { headers },  { params }).subscribe(data => {
         console.log(data);
     });
     console.log(test);
