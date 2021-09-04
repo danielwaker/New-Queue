@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Router, RouterModule, Routes } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
 import { AuthenicateService } from '../authenicate.service';
 
 @Component({
@@ -20,7 +20,7 @@ export class ExploreContainerComponent implements OnInit {
   public readonly redirect_uri	= 'redirect_uri';
   public readonly state_ = 'state';
 
-  constructor(private http: HttpClient, private router: Router, private auth: AuthenicateService) {
+  constructor(private route: ActivatedRoute, private router: Router, private auth: AuthenicateService) {
     auth.authenticatedEvent.subscribe(() => {
       console.log("User authenticated central component");
     });
@@ -29,7 +29,12 @@ export class ExploreContainerComponent implements OnInit {
    ngOnInit() {
      console.log("Container init");
      console.log(new Date(+localStorage.getItem("expiration")));
-     if (new Date(+localStorage.getItem("expiration")) < new Date())
-      this.router.navigate(['/login']);
+     if (new Date(+localStorage.getItem("expiration")) < new Date()) {
+       this.router.navigate(['/login']);
+     }
+     if (this.route.snapshot.queryParams.sessionId) {
+       localStorage.setItem('leader', 'false');
+       localStorage.setItem('sessionId', this.route.snapshot.queryParams.sessionId);
+     }
    }
 }
