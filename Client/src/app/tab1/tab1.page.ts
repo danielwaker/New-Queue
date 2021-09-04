@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CreateSession, Song, User } from '../interfaces';
 import * as signalR from '@microsoft/signalr';  
+import { PlayerComponent } from '../player/player.component';
 
 @Component({
   selector: 'app-tab1',
@@ -9,6 +10,7 @@ import * as signalR from '@microsoft/signalr';
   styleUrls: ['tab1.page.scss']
 })
 export class Tab1Page {
+  @ViewChild(PlayerComponent) player: PlayerComponent;
 
   public qrUrl;
   public userId;
@@ -103,6 +105,47 @@ export class Tab1Page {
         const sessionId = data.sessionID;
         localStorage.setItem('sessionId', sessionId);
         this.getUsers();
+        localStorage.setItem('leader', 'true');
+      });
+    });
+  }
+
+  startQueue() {
+    const bearer = 'Bearer ' + localStorage.getItem("access_token");
+    const headers = { "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": bearer};
+    if (this.queue[0] != null) {
+      const params = {
+        uri: this.queue[0][0].uri
+      };
+      if (!this.player.isPlaying) {
+        this._http.put<any>('https://api.spotify.com/v1/me/player/play', {}, { headers }).subscribe((data) => {
+          this.startQueueUtility();
+        });
+      } else {
+        this.startQueueUtility();
+      }
+    } else {
+      this._http.post<any>('https://api.spotify.com/v1/me/player/next', {}, { headers }).subscribe((data) => {
+          this.player.setCurrentSong();
+        });
+    }
+  }
+
+  startQueueUtility() {
+    const bearer = 'Bearer ' + localStorage.getItem("access_token");
+    const headers = { "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": bearer};
+    const params = {
+      uri: this.queue[0][0].uri
+    };
+    this._http.post<any>('https://api.spotify.com/v1/me/player/queue', {}, { params, headers }).subscribe((data) => {
+      this._http.post<any>('https://api.spotify.com/v1/me/player/next', {}, { headers }).subscribe((data) => {
+        console.log("next");
+        this.player.setCurrentSong(this.queue[0][0]);
+        this.removeSong(0);
       });
     });
   }

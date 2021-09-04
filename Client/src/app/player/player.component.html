@@ -5,10 +5,12 @@
       <div class="track-name">{{currentSong.artists[0].name}} - {{currentSong.name}}</div>
       <div class="track-time">{{progress | date:'m:ss'}} / {{currentSong.duration_ms | date:'m:ss'}}</div>
     </div>
-    <ion-icon *ngIf="isPlaying; else elseBlock" button name="pause-circle-outline" (click)="playPause(ePlayPause.pause)"></ion-icon>
-    <ng-template #elseBlock>
-      <ion-icon button name="play-circle-outline" (click)="playPause(ePlayPause.play)"></ion-icon>
-    </ng-template>
-    <ion-icon button name="play-skip-forward-circle-outline" (click)="nextSong()"></ion-icon>
+    <div *ngIf="leader" class="buttons">
+      <ion-icon *ngIf="isPlaying; else elseBlock" button name="pause-circle-outline" (click)="playPause(ePlayPause.pause)"></ion-icon>
+      <ng-template #elseBlock>
+        <ion-icon button name="play-circle-outline" (click)="playPause(ePlayPause.play)"></ion-icon>
+      </ng-template>
+      <ion-icon button name="play-skip-forward-circle-outline" (click)="nextSong()"></ion-icon>
+    </div>
   </ion-item>
 </ion-footer>

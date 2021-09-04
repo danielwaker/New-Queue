@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { empty } from 'rxjs';
 
 export enum PlayPause {
@@ -13,50 +13,86 @@ export enum PlayPause {
   styleUrls: ['./player.component.scss'],
 })
 export class PlayerComponent implements OnInit {
+  @Output() skipQueue = new EventEmitter();
   public isPlaying;
   public ePlayPause = PlayPause;
   public currentSong: SpotifyApi.TrackObjectFull;
   public progress: number;
   public interval: NodeJS.Timeout;
   public paused = false;
+  public leader: boolean;
   private playerURL = 'https://api.spotify.com/v1/me/player/';
   constructor(private _http: HttpClient) { }
 
   ngOnInit() {
     this.setCurrentSong();
+    this.leader = localStorage.getItem('leader') === 'true';
   }
 
-  setCurrentSong() {
-    const headers = this.headers(); 
-    this._http.get<any>(this.playerURL, { headers }).subscribe((playback: SpotifyApi.CurrentlyPlayingObject) => {
-      console.log(playback);
-      this.isPlaying = playback.is_playing;
-      this.currentSong = playback.item as SpotifyApi.TrackObjectFull;
-      this.progress = playback.progress_ms;
-      if (this.isPlaying) {
-        this.startTimer(this.currentSong.duration_ms, playback.progress_ms);
-      }
-    });
+  setCurrentSong(playing: SpotifyApi.TrackObjectFull = null) {
+    if (playing == null) {
+      const headers = this.headers(); 
+      this._http.get<any>(this.playerURL, { headers }).subscribe((playback: SpotifyApi.CurrentlyPlayingObject) => {
+        if (this.currentSong != null && playback.item.id == this.currentSong.id && playback.item.duration_ms == this.currentSong.duration_ms) {
+          this.setCurrentSong();
+          return;
+        }
+        this.isPlaying = playback.is_playing;
+        this.currentSong = playback.item as SpotifyApi.TrackObjectFull;
+        this.progress = playback.progress_ms;
+        console.log(playback);
+        console.log("IS PLAYING");
+        console.log(this.isPlaying);
+        if (this.isPlaying && this.interval == null) {
+          this.startTimer(this.currentSong.duration_ms, playback.progress_ms);
+        } else {
+          console.log("the else");
+          clearInterval(this.interval);
+          if (!this.isPlaying) {
+            this.paused = true;
+          }
+          this.startTimer(this.currentSong.duration_ms, playback.progress_ms);
+        }
+      });
+    } else {
+      this.currentSong = playing;
+      this.paused = false;
+      clearInterval(this.interval);
+      this.progress = 0;
+      this.startTimer(this.currentSong.duration_ms, 0);
+    }
   }
 
   startTimer(duration: number, progress: number) {
+    console.log("starting timer");
     this.interval = setInterval(() => {
       if (this.paused) {
         let doNothing;
+        console.log("do nothing");
       } else if ((progress + 1000) < duration) {
         progress += 1000;
         this.progress = progress;
+        console.log("progressing");
       } else {
-        this.setCurrentSong();
         clearInterval(this.interval);
+        this.progress = 0;
+        this.skipQueue.emit();
+        //this.setCurrentSong();
+        console.log("reset timer");
       }
-    },1000)
+    },1000);
+    console.log("function end");
   }
 
   playPause(playPause: PlayPause) {
-    const headers = this.headers(); 
+    const headers = this.headers();
+    console.log("playpause" + playPause);
+    console.log(this.playerURL + playPause);
     this._http.put<any>(this.playerURL + playPause, {}, { headers }).subscribe(() => {
       this.paused = (playPause == PlayPause.play) ? false : true;
+      if (playPause == PlayPause.play && this.interval == null) {
+        this.setCurrentSong();
+      }
     }, (error) => {
       const flip = (playPause == PlayPause.play) ? PlayPause.pause : PlayPause.play;
       this.paused = (playPause == PlayPause.play) ? false : true;
@@ -66,10 +102,7 @@ export class PlayerComponent implements OnInit {
   }
 
   nextSong() {
-    const headers = this.headers(); 
-    this._http.post<any>(this.playerURL + 'next', {}, { headers }).subscribe((playback: SpotifyApi.CurrentPlaybackResponse) => {
-      console.log(playback);
-    });
+    this.skipQueue.emit();
   }
 
   headers(): any {
