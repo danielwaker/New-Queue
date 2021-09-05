@@ -1,3 +1,4 @@
+/// <reference types="@types/spotify-api" />
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { AlertController, IonInput, LoadingController, ToastController } from '@ionic/angular';

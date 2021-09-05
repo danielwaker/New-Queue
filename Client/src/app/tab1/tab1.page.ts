@@ -1,3 +1,4 @@
+/// <reference types="@types/spotify-api" />
 import { HttpClient } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
 import { CreateSession, Song, User } from '../interfaces';

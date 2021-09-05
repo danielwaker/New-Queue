@@ -1,3 +1,4 @@
+/// <reference types="@types/spotify-api" />
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { empty } from 'rxjs';
