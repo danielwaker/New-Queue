@@ -53,4 +53,4 @@ jobs:
         app-name: 'party-queue'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_f43640c1461f45e58b841925e542c37e }}
-        package: ./www
+        package: ./dist/Client
