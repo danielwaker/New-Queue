@@ -50,6 +50,10 @@ export class Tab1Page {
     });
   }
 
+  searchTrackBy(index, track:SpotifyApi.TrackObjectFull) {
+    return track.id;
+  }
+
   getQueue() {
     const bearer = 'Bearer ' + localStorage.getItem("access_token");
     const headers = { "Accept": "application/json",

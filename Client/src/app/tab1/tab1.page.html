@@ -27,7 +27,7 @@
     <ion-list>
       <ion-item-sliding *ngFor="let track of queue; index as i; trackBy: searchTrackBy">
         <ion-item>
-          <ion-item #user class="track-user" [ngClass]="getColor(track[1], user)">{{track[1]}}</ion-item>
+          <ion-item #user class="track-user" (appColor)="getColor(track[1], user)">{{track[1]}}</ion-item>
           <ion-item class="track-data">
             <img class="track-cover" [src]="track[0].album.images[2].url"/>
             <div class="track-name">{{track[0].artists[0].name}} - {{track[0].name}}</div>

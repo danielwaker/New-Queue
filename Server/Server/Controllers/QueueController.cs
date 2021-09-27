@@ -138,7 +138,7 @@ namespace Server.Controllers
         public async Task<IActionResult> Callback(string code, string state)
         {
             string baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
-            var preUri = string.Concat(baseUrl, "/Queue/Callback");
+            var preUri = string.Concat(baseUrl, "Queue/Callback");
             var uri = new Uri(preUri);
 
             var response = await new OAuthClient().RequestToken(
