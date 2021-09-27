@@ -21,3 +21,10 @@ steps:
     ng build --prod
   displayName: 'npm install and build'
   workingDirectory: Client
+- task: AzureStaticWebApp@0
+  inputs:
+      app_location: "/" 
+      api_location: "api"
+      output_location: "www"
+  env:
+      azure_static_web_apps_api_token: $(deployment_token)
