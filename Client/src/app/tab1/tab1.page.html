@@ -25,7 +25,7 @@
   </div>
   <div *ngIf="queue && queue.length > 0">
     <ion-list>
-      <ion-item-sliding *ngFor="let track of queue; index as i; trackBy: searchTrackBy">
+      <ion-item-sliding *ngFor="let track of queue; index as i">
         <ion-item>
           <ion-item #user class="track-user" (appColor)="getColor(track[1], user)">{{track[1]}}</ion-item>
           <ion-item class="track-data">
