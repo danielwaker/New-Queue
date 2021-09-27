@@ -144,7 +144,7 @@ namespace Server.Controllers
             var response = await new OAuthClient().RequestToken(
                 new AuthorizationCodeTokenRequest("5794ad59a90744c9aba2ca18cd73bc10", "8a1204cb1f0042679933dcd724ab919f", code, uri));
             var spotify = new SpotifyClient(response.AccessToken);
-            var url = $"http://localhost:8100/callback?access_token={response.AccessToken}&token_type={response.TokenType}&expires_in={response.ExpiresIn}";
+            var url = $"https://ambitious-grass-0ffb2921e.azurestaticapps.net/callback?access_token={response.AccessToken}&token_type={response.TokenType}&expires_in={response.ExpiresIn}";
             return Redirect(url);
         }
 
