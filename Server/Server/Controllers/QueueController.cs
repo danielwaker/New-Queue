@@ -98,9 +98,9 @@ namespace Server.Controllers
                 Session session = DeserializeSession(sessionID);
                 session.AddUser(user);
                 ReserializeSession(sessionID, session);
-                await _hubContext.Clients.Group(sessionID).BroadcastUsers();
             }
             await _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
+            if (!reconnect) await _hubContext.Clients.Group(sessionID).BroadcastUsers();
             return NoContent();
         }
 
