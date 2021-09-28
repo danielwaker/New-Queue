@@ -35,7 +35,7 @@ export class Tab1Page {
   
     this.connection.start().then(() => {  
       console.log('SignalR Connected!');
-      if (localStorage.getItem('user')) {
+      if (localStorage.getItem('sessionId')) {
         this.addUser();
       }
     }).catch(function (err) {  
