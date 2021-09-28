@@ -91,11 +91,14 @@ namespace Server.Controllers
         }
 
         [HttpPost("AddUser")]
-        public async Task<IActionResult> AddUser(string sessionID, string user, string connectionID)
+        public async Task<IActionResult> AddUser(string sessionID, string user, string connectionID, bool reconnect = false)
         {
-            Session session = DeserializeSession(sessionID);
-            session.AddUser(user);
-            ReserializeSession(sessionID, session);
+            if (!reconnect)
+            {
+                Session session = DeserializeSession(sessionID);
+                session.AddUser(user);
+                ReserializeSession(sessionID, session);
+            }
             await _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
             await _hubContext.Clients.Group(sessionID).BroadcastUsers();
             return NoContent();
