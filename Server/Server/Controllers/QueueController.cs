@@ -100,7 +100,7 @@ namespace Server.Controllers
                 ReserializeSession(sessionID, session);
             }
             await _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
-            if (!reconnect) await _hubContext.Clients.Group(sessionID).BroadcastUsers();
+            await _hubContext.Clients.Group(sessionID).BroadcastUsers();
             return NoContent();
         }
 
