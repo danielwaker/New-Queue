@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { AuthenicateService } from '../authenicate.service';
 
@@ -25,7 +25,7 @@ export class LoginPage implements OnInit {
   public readonly state_ = 'state';
   public readonly scope_ = 'scope';
 
-  constructor(private http: HttpClient, private router: Router, private auth: AuthenicateService) {
+  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router, private auth: AuthenicateService) {
     auth.authenticatedEvent.subscribe(() => {
       console.log("User authenticated central component");
     });
@@ -44,7 +44,10 @@ export class LoginPage implements OnInit {
     // this.http.get<any>(this.authorizeUrl, {params}).subscribe(data => {
     //   console.log(data);
     // });
-
+    if (this.route.snapshot.queryParams.sessionId) {
+      localStorage.setItem('leader', 'false');
+      localStorage.setItem('sessionId', this.route.snapshot.queryParams.sessionId);
+    }
     console.log(localStorage.getItem('access_token'));
   }
 

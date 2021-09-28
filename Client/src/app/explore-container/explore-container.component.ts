@@ -32,9 +32,5 @@ export class ExploreContainerComponent implements OnInit {
      if (new Date(+localStorage.getItem("expiration")) < new Date()) {
        this.router.navigate(['/login']);
      }
-     if (this.route.snapshot.queryParams.sessionId) {
-       localStorage.setItem('leader', 'false');
-       localStorage.setItem('sessionId', this.route.snapshot.queryParams.sessionId);
-     }
    }
 }
