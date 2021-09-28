@@ -30,7 +30,7 @@ namespace Server.Controllers
         {
             string sessionID = SessionID();
             //string url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}?sessionID={sessionID}";
-            string url = $"https://ambitious-grass-0ffb2921e.azurestaticapps.net?sessionID={sessionID}";
+            string url = $"https://ambitious-grass-0ffb2921e.azurestaticapps.net/login?sessionID={sessionID}";
             string sessionQR = SessionQR(url);
             CreateSessionData(sessionID, user);
             _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
