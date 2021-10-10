@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
 using QRCoder;
 using SpotifyAPI.Web;
 using System;
@@ -21,16 +22,19 @@ namespace Server.Controllers
     public class QueueController : ControllerBase
     {
         private readonly IHubContext<BroadcastHub, IHubClient> _hubContext;
-        public QueueController(IHubContext<BroadcastHub, IHubClient> hubContext)
+        private readonly IConfiguration _iConfig;
+        public QueueController(IHubContext<BroadcastHub, IHubClient> hubContext, IConfiguration iConfig)
         {
             _hubContext = hubContext;
+            _iConfig = iConfig;
         }
+
         [HttpGet("CreateSession")]
         public object CreateSession(string user, string connectionID)
         {
             string sessionID = SessionID();
             //string url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}?sessionID={sessionID}";
-            string url = $"https://ambitious-grass-0ffb2921e.azurestaticapps.net/login?sessionID={sessionID}";
+            string url = _iConfig.GetValue<string>("URL") + $"login?sessionID={sessionID}";
             string sessionQR = SessionQR(url);
             CreateSessionData(sessionID, user);
             _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
@@ -148,7 +152,7 @@ namespace Server.Controllers
             var response = await new OAuthClient().RequestToken(
                 new AuthorizationCodeTokenRequest("5794ad59a90744c9aba2ca18cd73bc10", "8a1204cb1f0042679933dcd724ab919f", code, uri));
             var spotify = new SpotifyClient(response.AccessToken);
-            var url = $"https://ambitious-grass-0ffb2921e.azurestaticapps.net/callback?access_token={response.AccessToken}&token_type={response.TokenType}&expires_in={response.ExpiresIn}";
+            var url = _iConfig.GetValue<string>("URL") + $"callback?access_token={response.AccessToken}&token_type={response.TokenType}&expires_in={response.ExpiresIn}";
             //trigger workflow
             return Redirect(url);
         }
