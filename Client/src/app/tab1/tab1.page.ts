@@ -34,7 +34,10 @@ export class Tab1Page {
       .build();
   
     this.connection.start().then(() => {  
-      console.log('SignalR Connected!');  
+      console.log('SignalR Connected!');
+      if (localStorage.getItem('sessionId')) {
+        this.addUser();
+      }
     }).catch(function (err) {  
       return console.error(err.toString());  
     });
@@ -48,6 +51,36 @@ export class Tab1Page {
       console.log("Notification");
       this.getUsers();
     });
+  }
+
+  async addUser() {
+    let reconnect = false;
+    if (localStorage.getItem('user')) {
+      reconnect = true;
+    } else {
+      let user = await this.spotifyUser();
+      localStorage.setItem('user', user.display_name);
+    }
+
+    const params = {
+      sessionID: localStorage.getItem('sessionId'),
+      user: localStorage.getItem('user'),
+      connectionID: this.connection.connectionId,
+      reconnect: reconnect
+    };
+    console.log(params);
+    this._http.post(environment.apiUrl + 'Queue/AddUser/', {}, { params }).subscribe(data => {
+      console.log(data);
+    });
+  }
+
+  async spotifyUser() {
+    const bearer = 'Bearer ' + localStorage.getItem("access_token");
+    const headers = { "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": bearer};
+    
+    return await this._http.get<SpotifyApi.UserProfileResponse>('https://api.spotify.com/v1/me', {headers}).toPromise();
   }
 
   getQueue() {
@@ -87,28 +120,25 @@ export class Tab1Page {
     });
   }
 
-  createSession() {
+  async createSession() {
     const bearer = 'Bearer ' + localStorage.getItem("access_token");
     const headers = { "Accept": "application/json",
     "Content-Type": "application/json",
     "Authorization": bearer};
     
-    this._http.get<any>('https://api.spotify.com/v1/me', {headers}).subscribe((data: SpotifyApi.UserProfileResponse) => {
+    let user = await this.spotifyUser();
+    localStorage.setItem('user', user.display_name);
+    const params = {
+      user: localStorage.getItem('user'),
+      connectionID: this.connection.connectionId
+    };
+    this._http.get(environment.apiUrl + 'Queue/CreateSession/',  { params }).subscribe((data: CreateSession) => {
       console.log(data);
-      const user = data.display_name;
-      const params = {
-        user: user,
-        connectionID: this.connection.connectionId
-      };
-      localStorage.setItem('user', user);
-      this._http.get(environment.apiUrl + 'Queue/CreateSession/',  { params }).subscribe((data: CreateSession) => {
-        console.log(data);
-        this.qrUrl = 'data:image/jpeg;base64,' + data.sessionQR;
-        const sessionId = data.sessionID;
-        localStorage.setItem('sessionId', sessionId);
-        this.getUsers();
-        localStorage.setItem('leader', 'true');
-      });
+      this.qrUrl = 'data:image/jpeg;base64,' + data.sessionQR;
+      const sessionId = data.sessionID;
+      localStorage.setItem('sessionId', sessionId);
+      this.getUsers();
+      localStorage.setItem('leader', 'true');
     });
   }
 

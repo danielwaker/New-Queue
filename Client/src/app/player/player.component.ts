@@ -73,7 +73,7 @@ export class PlayerComponent implements OnInit {
       } else if ((progress + 1000) < duration) {
         progress += 1000;
         this.progress = progress;
-        console.log("progressing");
+        //console.log("progressing");
       } else {
         clearInterval(this.interval);
         this.progress = 0;

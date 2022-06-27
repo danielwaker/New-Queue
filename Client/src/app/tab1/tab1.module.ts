@@ -7,6 +7,7 @@ import { ExploreContainerComponentModule } from '../explore-container/explore-co
 
 import { Tab1PageRoutingModule } from './tab1-routing.module';
 import { PlayerModule } from '../player/player.module';
+import { ColorDirective } from '../color-directive/color.directive';
 
 @NgModule({
   imports: [
@@ -17,6 +18,6 @@ import { PlayerModule } from '../player/player.module';
     Tab1PageRoutingModule,
     PlayerModule
   ],
-  declarations: [Tab1Page]
+  declarations: [Tab1Page, ColorDirective]
 })
 export class Tab1PageModule {}

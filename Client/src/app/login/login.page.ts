@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { AuthenicateService } from '../authenicate.service';
 
@@ -15,7 +15,7 @@ export class LoginPage implements OnInit {
   public responseTypeToken = 'token';
   public responseTypeCode = 'code';
   public redirectUriFront = 'http://localhost:8100/callback';
-  public redirectUriBack = environment.apiUrl + '/Queue/Callback';
+  public redirectUriBack = environment.apiUrl + 'Queue/Callback';
   public state = 'secret';
   public scope = "user-modify-playback-state user-read-playback-state user-read-playback-position user-read-private user-read-email playlist-read-private user-library-read user-library-modify user-top-read playlist-read-collaborative playlist-modify-public playlist-modify-private ugc-image-upload user-follow-read user-follow-modify user-modify-playback-state user-read-currently-playing user-read-recently-played";
   public readonly authorizeUrl = 'https://accounts.spotify.com/authorize?';
@@ -25,7 +25,7 @@ export class LoginPage implements OnInit {
   public readonly state_ = 'state';
   public readonly scope_ = 'scope';
 
-  constructor(private http: HttpClient, private router: Router, private auth: AuthenicateService) {
+  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router, private auth: AuthenicateService) {
     auth.authenticatedEvent.subscribe(() => {
       console.log("User authenticated central component");
     });
@@ -45,6 +45,10 @@ export class LoginPage implements OnInit {
     //   console.log(data);
     // });
 
+    if (this.route.snapshot.queryParams.sessionID) {
+      localStorage.setItem('leader', 'false');
+      localStorage.setItem('sessionId', this.route.snapshot.queryParams.sessionID);
+    }
     console.log(localStorage.getItem('access_token'));
   }
 
