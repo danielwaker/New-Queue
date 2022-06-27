@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,6 +25,10 @@ namespace Server
 
     public class Session
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
+
         public string sessionID { get; set; }
         public string leader { get; set; }
         public OrderedDictionary users { get; set; }

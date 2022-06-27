@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace Server
     public class Startup
     {
         private string[] origins;
+        private string _moviesApiKey = null;
 
         public Startup(IConfiguration configuration)
         {
@@ -29,6 +31,12 @@ namespace Server
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            _moviesApiKey = Configuration["Movies:ServiceApiKey"];
+
+            services.Configure<SessionDatabaseSettings>(Configuration.GetSection(nameof(SessionDatabaseSettings)));
+            services.AddSingleton<ISessionDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<SessionDatabaseSettings>>().Value);
+
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
