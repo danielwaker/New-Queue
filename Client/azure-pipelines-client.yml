@@ -28,7 +28,7 @@ steps:
   workingDirectory: Client
 - task: AzureStaticWebApp@0
   inputs:
-      app_location: "Client/" 
+      app_location: "/" 
       api_location: "api"
       output_location: "Client/dist/New-Queue"
   env:
