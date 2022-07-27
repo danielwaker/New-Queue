@@ -16,7 +16,7 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
-    npm install -g @angular/cli
+    npm install -g @angular/cli@12.0.5
     npm install
     ng build --prod
   displayName: 'npm install and build'
@@ -25,6 +25,6 @@ steps:
   inputs:
       app_location: "/" 
       api_location: "api"
-      output_location: "Client/www"
+      output_location: "www"
   env:
       azure_static_web_apps_api_token: $(deployment_token)
