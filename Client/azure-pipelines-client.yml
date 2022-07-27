@@ -25,7 +25,7 @@ steps:
     npm install
     ng build --prod
   displayName: 'npm install and build'
-  workingDirectory: Client
+
 - task: AzureStaticWebApp@0
   inputs:
       app_location: "/" 
