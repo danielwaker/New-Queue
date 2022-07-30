@@ -114,9 +114,13 @@ export class Tab1Page {
     console.log(params);
     this._http.get(environment.apiUrl + 'Queue/GetUsers/', { params }).subscribe((data: Record<string,User>) => {
       this.users = data;
-      this.leader = this.users[localStorage.getItem('user')].Leader;
-      if (getQueue) {
-        this.getQueue();
+      if (data === null) {
+        localStorage.removeItem("sessionId");
+      } else {
+        this.leader = this.users[localStorage.getItem('user')].Leader;
+        if (getQueue) {
+          this.getQueue();
+        }
       }
     });
   }

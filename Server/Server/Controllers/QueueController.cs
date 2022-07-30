@@ -161,19 +161,22 @@ namespace Server.Controllers
         {
             string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
             string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
-            var jsonString = System.IO.File.ReadAllText(path);
+            var jsonString = (System.IO.File.Exists(path)) ? System.IO.File.ReadAllText(path) : "{}";
             return JsonSerializer.Deserialize<Session>(jsonString);
         }
 
         private void ReserializeSession(string sessionID, Session session)
         {
-            string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
-            string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
-            using (FileStream fs = System.IO.File.Open(path, FileMode.Create))
+            if (session.GetUsers() != null)
             {
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                byte[] info = JsonSerializer.SerializeToUtf8Bytes(session, options);
-                fs.Write(info, 0, info.Length);
+                string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
+                string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
+                using (FileStream fs = System.IO.File.Open(path, FileMode.Create))
+                {
+                    var options = new JsonSerializerOptions { WriteIndented = true };
+                    byte[] info = JsonSerializer.SerializeToUtf8Bytes(session, options);
+                    fs.Write(info, 0, info.Length);
+                }
             }
         }
     }
