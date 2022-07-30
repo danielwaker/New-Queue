@@ -1,6 +1,6 @@
 /// <reference types="@types/spotify-api" />
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { empty } from 'rxjs';
 
 export enum PlayPause {
@@ -14,6 +14,7 @@ export enum PlayPause {
   styleUrls: ['./player.component.scss'],
 })
 export class PlayerComponent implements OnInit {
+  @Input() leader = false;
   @Output() skipQueue = new EventEmitter();
   public isPlaying;
   public ePlayPause = PlayPause;
@@ -21,7 +22,6 @@ export class PlayerComponent implements OnInit {
   public progress: number;
   public interval: NodeJS.Timeout;
   public paused = false;
-  public leader: boolean;
   private playerURL = 'https://api.spotify.com/v1/me/player/';
   constructor(private _http: HttpClient) { }
 
@@ -42,8 +42,7 @@ export class PlayerComponent implements OnInit {
         this.currentSong = playback.item as SpotifyApi.TrackObjectFull;
         this.progress = playback.progress_ms;
         console.log(playback);
-        console.log("IS PLAYING");
-        console.log(this.isPlaying);
+        console.log("IS PLAYING", this.isPlaying);
         if (this.isPlaying && this.interval == null) {
           this.startTimer(this.currentSong.duration_ms, playback.progress_ms);
         } else {
@@ -77,8 +76,8 @@ export class PlayerComponent implements OnInit {
       } else {
         clearInterval(this.interval);
         this.progress = 0;
-        this.skipQueue.emit();
-        //this.setCurrentSong();
+        //this.skipQueue.emit();
+        this.setCurrentSong();
         console.log("reset timer");
       }
     },1000);

@@ -21,6 +21,7 @@ export class Tab1Page {
   public queue: [SpotifyApi.TrackObjectFull, string][];
   public users: Record<string,User>;
   public queueStarted = false;
+  public leader = false;
 
   constructor(private _http: HttpClient) { }
 
@@ -113,7 +114,7 @@ export class Tab1Page {
     console.log(params);
     this._http.get(environment.apiUrl + 'Queue/GetUsers/', { params }).subscribe((data: Record<string,User>) => {
       this.users = data;
-      console.log(data);
+      this.leader = this.users[localStorage.getItem('user')].Leader;
       if (getQueue) {
         this.getQueue();
       }
@@ -194,6 +195,6 @@ export class Tab1Page {
   }
 
   getColor(user: string, el: any) {
-    el.el.style.setProperty('--background', this.users[user].color);
+    el.el.style.setProperty('--background', this.users[user].Color);
   }
 }
