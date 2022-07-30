@@ -2,11 +2,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { empty } from 'rxjs';
-
-export enum PlayPause {
-  play = 'play',
-  pause = 'pause'
-}
+import { PlayPause } from '../enums';
 
 @Component({
   selector: 'app-player',
@@ -27,7 +23,6 @@ export class PlayerComponent implements OnInit {
 
   ngOnInit() {
     this.setCurrentSong();
-    this.leader = localStorage.getItem('leader') === 'true';
   }
 
   setCurrentSong(playing: SpotifyApi.TrackObjectFull = null) {
@@ -76,6 +71,7 @@ export class PlayerComponent implements OnInit {
       } else {
         clearInterval(this.interval);
         this.progress = 0;
+        //TODO: clear queue, such as albums
         //this.skipQueue.emit();
         this.setCurrentSong();
         console.log("reset timer");

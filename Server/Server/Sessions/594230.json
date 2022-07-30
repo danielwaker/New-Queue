@@ -1,0 +1,22 @@
+{
+  "Id": null,
+  "sessionID": "594230",
+  "users": {
+    "danielwaker": {
+      "Songs": 10,
+      "Color": "#8180da",
+      "Leader": false
+    },
+    "joe": {
+      "Songs": 0,
+      "Color": "#0180da",
+      "Leader": true
+    }
+  },
+  "songs": [
+    {
+      "User": "danielwaker",
+      "Uri": null
+    }
+  ]
+}

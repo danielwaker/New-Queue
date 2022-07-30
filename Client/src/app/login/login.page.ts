@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { AuthenicateService } from '../authenicate.service';
+import { LocalStorageEnum } from '../enums';
 
 @Component({
   selector: 'app-login',
@@ -46,8 +47,7 @@ export class LoginPage implements OnInit {
     // });
 
     if (this.route.snapshot.queryParams.sessionID) {
-      localStorage.setItem('leader', 'false');
-      localStorage.setItem('sessionId', this.route.snapshot.queryParams.sessionID);
+      localStorage.setItem(LocalStorageEnum.SessionId, this.route.snapshot.queryParams.sessionID);
     }
     console.log(localStorage.getItem('access_token'));
   }

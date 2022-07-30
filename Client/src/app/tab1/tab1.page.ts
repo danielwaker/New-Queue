@@ -5,6 +5,7 @@ import { CreateSession, Song, User } from '../interfaces';
 import * as signalR from '@microsoft/signalr';  
 import { PlayerComponent } from '../player/player.component';
 import { environment } from 'src/environments/environment';
+import { SessionEnum, LocalStorageEnum, ShowOrHide } from '../enums';
 
 @Component({
   selector: 'app-tab1',
@@ -15,19 +16,23 @@ export class Tab1Page {
   @ViewChild(PlayerComponent) player: PlayerComponent;
 
   public qrUrl;
-  public userId;
-  public sessionId;
   public connection: signalR.HubConnection;
   public queue: [SpotifyApi.TrackObjectFull, string][];
   public users: Record<string,User>;
   public queueStarted = false;
   public leader = false;
+  public sessionStatus = SessionEnum.Create;
+  public showQr = false;
+  public showOrHide = ShowOrHide.Show;
 
   constructor(private _http: HttpClient) { }
 
   ngOnInit() {
     if (localStorage.getItem('sessionId')) {
       this.getUsers(true);
+      this.qrUrl = localStorage.getItem('qr');
+    } else {
+      this.leader = true;
     }
     this.connection = new signalR.HubConnectionBuilder()  
       .configureLogging(signalR.LogLevel.Information)  
@@ -60,7 +65,7 @@ export class Tab1Page {
       reconnect = true;
     } else {
       let user = await this.spotifyUser();
-      localStorage.setItem('user', user.display_name);
+      localStorage.setItem(LocalStorageEnum.User, user.display_name);
     }
 
     const params = {
@@ -118,11 +123,22 @@ export class Tab1Page {
         localStorage.removeItem("sessionId");
       } else {
         this.leader = this.users[localStorage.getItem('user')].Leader;
+        this.sessionStatus = (this.leader) ? SessionEnum.End : SessionEnum.Leave;
         if (getQueue) {
           this.getQueue();
         }
       }
     });
+  }
+
+  async session() {
+    if (this.sessionStatus === SessionEnum.Create) {
+      await this.createSession();
+      this.sessionStatus = SessionEnum.End;
+    } else {
+      this.leaveSession(this.sessionStatus === SessionEnum.End);
+      this.sessionStatus = SessionEnum.Create;
+    }
   }
 
   async createSession() {
@@ -132,7 +148,7 @@ export class Tab1Page {
     "Authorization": bearer};
     
     let user = await this.spotifyUser();
-    localStorage.setItem('user', user.display_name);
+    localStorage.setItem(LocalStorageEnum.User, user.display_name);
     const params = {
       user: localStorage.getItem('user'),
       connectionID: this.connection.connectionId
@@ -140,11 +156,28 @@ export class Tab1Page {
     this._http.get(environment.apiUrl + 'Queue/CreateSession/',  { params }).subscribe((data: CreateSession) => {
       console.log(data);
       this.qrUrl = 'data:image/jpeg;base64,' + data.sessionQR;
+      this.showQr = true;
+      this.showOrHide = ShowOrHide.Hide;
+      localStorage.setItem(LocalStorageEnum.Qr, this.qrUrl);
       const sessionId = data.sessionID;
-      localStorage.setItem('sessionId', sessionId);
+      localStorage.setItem(LocalStorageEnum.SessionId, sessionId);
       this.getUsers();
-      localStorage.setItem('leader', 'true');
     });
+  }
+
+  // TODO: Remove user from list of users when leaving
+  leaveSession(end = false) {
+    if (end) {
+      const params = {
+        sessionID: localStorage.getItem('sessionId')
+      };
+      this._http.post(environment.apiUrl + 'Queue/EndSession/', {}, { params }).subscribe(data => {
+        console.log(data);
+      });
+    }
+    localStorage.removeItem(LocalStorageEnum.Qr);
+    localStorage.removeItem(LocalStorageEnum.SessionId);
+    location.reload();
   }
 
   startQueue() {
@@ -200,5 +233,10 @@ export class Tab1Page {
 
   getColor(user: string, el: any) {
     el.el.style.setProperty('--background', this.users[user].Color);
+  }
+
+  toggleQr() {
+    this.showQr = !this.showQr;
+    this.showOrHide = (this.showQr) ? ShowOrHide.Hide : ShowOrHide.Show;
   }
 }

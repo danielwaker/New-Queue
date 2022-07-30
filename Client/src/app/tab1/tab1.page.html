@@ -18,8 +18,9 @@
 
   <app-explore-container class="container" name="Front Page"></app-explore-container>
   <div class="buttons">
-    <ion-button (click)="createSession()">Create Session</ion-button>
-    <div *ngIf="qrUrl">
+    <ion-button (click)="session()">{{sessionStatus}} Session</ion-button>
+    <ion-button *ngIf="sessionStatus !== 'Create'" (click)="toggleQr()">{{showOrHide}} QR Code</ion-button>
+    <div *ngIf="showQr">
       <img class="qr" [src]="qrUrl"/>
     </div>
   </div>

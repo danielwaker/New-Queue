@@ -45,6 +45,14 @@ namespace Server.Controllers
             };
         }
 
+        [HttpPost("EndSession")]
+        public void EndSession(string sessionID)
+        {
+            string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
+            string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
+            System.IO.File.Delete(path);
+        }
+
         /// <summary>
         /// Creates a session ID in the form of a 6 digit number.
         /// </summary>
