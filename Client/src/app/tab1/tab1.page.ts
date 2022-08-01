@@ -1,11 +1,12 @@
 /// <reference types="@types/spotify-api" />
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CreateSession, Song, User } from '../interfaces';
 import * as signalR from '@microsoft/signalr';  
 import { PlayerComponent } from '../player/player.component';
 import { environment } from 'src/environments/environment';
 import { SessionEnum, LocalStorageEnum, ShowOrHide } from '../enums';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tab1',
@@ -25,7 +26,7 @@ export class Tab1Page {
   public showQr = false;
   public showOrHide = ShowOrHide.Show;
 
-  constructor(private _http: HttpClient) { }
+  constructor(private _http: HttpClient, private alertController: AlertController) { }
 
   ngOnInit() {
     if (localStorage.getItem('sessionId')) {
@@ -142,6 +143,7 @@ export class Tab1Page {
   }
 
   async createSession() {
+    await this.presentAlert();
     const bearer = 'Bearer ' + localStorage.getItem("access_token");
     const headers = { "Accept": "application/json",
     "Content-Type": "application/json",
@@ -163,6 +165,15 @@ export class Tab1Page {
       localStorage.setItem(LocalStorageEnum.SessionId, sessionId);
       this.getUsers();
     });
+  }
+
+  async presentAlert() {
+    const alert = await this.alertController.create({
+      message: 'Please remove any items from the queue in your Spotify app before starting queue.',
+      buttons: ['OK']
+    });
+
+    await alert.present();
   }
 
   // TODO: Remove user from list of users when leaving
@@ -238,5 +249,9 @@ export class Tab1Page {
   toggleQr() {
     this.showQr = !this.showQr;
     this.showOrHide = (this.showQr) ? ShowOrHide.Hide : ShowOrHide.Show;
+  }
+
+  refresh() {
+    this.player.refresh();
   }
 }

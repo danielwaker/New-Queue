@@ -11,10 +11,12 @@ import { PlayPause } from '../enums';
 })
 export class PlayerComponent implements OnInit {
   @Input() leader = false;
+  @Input() queue: [SpotifyApi.TrackObjectFull, string][];
   @Output() skipQueue = new EventEmitter();
   public isPlaying;
   public ePlayPause = PlayPause;
   public currentSong: SpotifyApi.TrackObjectFull;
+  public previousSong: SpotifyApi.TrackObjectFull;
   public progress: number;
   public interval: NodeJS.Timeout;
   public paused = false;
@@ -25,6 +27,12 @@ export class PlayerComponent implements OnInit {
     this.setCurrentSong();
   }
 
+  refresh() {
+    this.currentSong = null;
+    this.paused = false;
+    this.setCurrentSong();
+  }
+
   setCurrentSong(playing: SpotifyApi.TrackObjectFull = null) {
     if (playing == null) {
       const headers = this.headers(); 
@@ -32,9 +40,12 @@ export class PlayerComponent implements OnInit {
         if (this.currentSong != null && playback.item.id == this.currentSong.id && playback.item.duration_ms == this.currentSong.duration_ms) {
           this.setCurrentSong();
           return;
+        } else if (playback == null) {
+          return;
         }
         this.isPlaying = playback.is_playing;
         this.currentSong = playback.item as SpotifyApi.TrackObjectFull;
+        this.previousSong = this.currentSong;
         this.progress = playback.progress_ms;
         console.log(playback);
         console.log("IS PLAYING", this.isPlaying);
@@ -51,7 +62,9 @@ export class PlayerComponent implements OnInit {
       });
     } else {
       this.currentSong = playing;
+      //TODO: why does paused and isplaying both exist lol
       this.paused = false;
+      this.isPlaying = true;
       clearInterval(this.interval);
       this.progress = 0;
       this.startTimer(this.currentSong.duration_ms, 0);
@@ -71,9 +84,11 @@ export class PlayerComponent implements OnInit {
       } else {
         clearInterval(this.interval);
         this.progress = 0;
-        //TODO: clear queue, such as albums
-        //this.skipQueue.emit();
-        this.setCurrentSong();
+        if (this.queue.length > 0) {
+          this.skipQueue.emit();
+        } else {
+          this.setCurrentSong();
+        }
         console.log("reset timer");
       }
     },1000);

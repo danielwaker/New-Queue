@@ -1,11 +1,9 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 1
-    </ion-title>
-    <ion-buttons *ngIf="users" slot="end">
+    <ion-buttons *ngIf="users" slot="start">
       <ion-button (click)="startQueue()">start queue</ion-button>
     </ion-buttons>
+    <ion-icon button name="refresh-circle-outline" slot="end" class="refresh" (click)="refresh()"></ion-icon>
   </ion-toolbar>
 </ion-header>
 
@@ -42,4 +40,4 @@
     </ion-list>
   </div>
 </ion-content>
-<app-player (skipQueue)="startQueue()" [leader]="leader"></app-player>
+<app-player (skipQueue)="startQueue()" [leader]="leader" [queue]="queue"></app-player>
