@@ -18,7 +18,7 @@ export class LoginPage implements OnInit {
   public redirectUriFront = 'http://localhost:8100/callback';
   public redirectUriBack = environment.apiUrl + 'Queue/Callback';
   public state = 'secret';
-  public scope = "user-modify-playback-state user-read-playback-state user-read-playback-position user-read-private user-read-email playlist-read-private user-library-read user-library-modify user-top-read playlist-read-collaborative playlist-modify-public playlist-modify-private ugc-image-upload user-follow-read user-follow-modify user-modify-playback-state user-read-currently-playing user-read-recently-played";
+  public scope = "user-modify-playback-state user-read-playback-state user-read-playback-position user-read-private user-read-email playlist-read-private user-library-read user-library-modify user-top-read playlist-read-collaborative playlist-modify-public playlist-modify-private ugc-image-upload user-follow-read user-follow-modify user-modify-playback-state user-read-currently-playing user-read-recently-played streaming";
   public readonly authorizeUrl = 'https://accounts.spotify.com/authorize?';
   public readonly client_id = 'client_id';
   public readonly response_type = 'response_type';
