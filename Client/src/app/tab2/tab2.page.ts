@@ -30,7 +30,7 @@ export class Tab2Page {
   public q = '';
   public bounds = 10;
 
-  constructor(private http: HttpClient, private alertController: AlertController, private loadingController: LoadingController) {}
+  constructor(private http: HttpClient, private alertController: AlertController, private toastController: ToastController, private loadingController: LoadingController) {}
 
   searchTrackBy(index, track:SpotifyApi.TrackObjectFull) {
     return track.id;
@@ -123,6 +123,7 @@ export class Tab2Page {
     console.log(params);
     const test = this.http.post<any>(environment.apiUrl + 'Queue/AddSong/', { headers },  { params }).subscribe(data => {
         console.log(data);
+        this.addedToQueueAlert();
     });
     console.log(test);
   }
@@ -160,6 +161,16 @@ export class Tab2Page {
       header: 'Queue unsuccessful',
       message: 'No devices available.',
       buttons: ['OK']
+    });
+
+    await alert.present();
+  }
+
+  async addedToQueueAlert() {
+    const alert = await this.toastController.create({
+      header: 'Queued',
+      duration: 1500,
+      cssClass: 'queued'
     });
 
     await alert.present();
