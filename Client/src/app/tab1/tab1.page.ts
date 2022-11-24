@@ -143,7 +143,7 @@ export class Tab1Page {
   }
 
   async createSession() {
-    await this.presentAlert();
+    await this.createQueueAlert();
     const bearer = 'Bearer ' + localStorage.getItem("access_token");
     const headers = { "Accept": "application/json",
     "Content-Type": "application/json",
@@ -167,9 +167,18 @@ export class Tab1Page {
     });
   }
 
-  async presentAlert() {
+  async createQueueAlert() {
     const alert = await this.alertController.create({
       message: 'Please remove any items from the queue in your Spotify app before starting queue.',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+  }
+
+  async qrAlert() {
+    const alert = await this.alertController.create({
+      message: `<img src="${this.qrUrl}"/>`,
       buttons: ['OK']
     });
 
@@ -247,8 +256,12 @@ export class Tab1Page {
   }
 
   toggleQr() {
-    this.showQr = !this.showQr;
-    this.showOrHide = (this.showQr) ? ShowOrHide.Hide : ShowOrHide.Show;
+    if (!this.showQr) {
+      this.qrAlert();
+    } else {
+      this.showQr = !this.showQr;
+      this.showOrHide = (this.showQr) ? ShowOrHide.Hide : ShowOrHide.Show;
+    }
   }
 
   refresh() {
