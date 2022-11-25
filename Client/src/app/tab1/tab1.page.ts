@@ -267,6 +267,7 @@ export class Tab1Page {
       this.qrAlert();
       const inviteUrl =  window.location.origin + `/login?sessionID=${localStorage.getItem(LocalStorageEnum.SessionId)}`;
       this.clipboard.copy(inviteUrl);
+      navigator.clipboard.writeText(inviteUrl);
     } else {
       this.showQr = !this.showQr;
       this.showOrHide = (this.showQr) ? ShowOrHide.Hide : ShowOrHide.Show;
