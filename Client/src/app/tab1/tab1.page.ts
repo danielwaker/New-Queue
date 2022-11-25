@@ -6,7 +6,8 @@ import * as signalR from '@microsoft/signalr';
 import { PlayerComponent } from '../player/player.component';
 import { environment } from 'src/environments/environment';
 import { SessionEnum, LocalStorageEnum, ShowOrHide } from '../enums';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
+import { Clipboard } from '@awesome-cordova-plugins/clipboard/ngx';
 
 @Component({
   selector: 'app-tab1',
@@ -26,7 +27,7 @@ export class Tab1Page {
   public showQr = false;
   public showOrHide = ShowOrHide.Show;
 
-  constructor(private _http: HttpClient, private alertController: AlertController) { }
+  constructor(private _http: HttpClient, private alertController: AlertController, private toastController: ToastController, private clipboard: Clipboard) { }
 
   ngOnInit() {
     if (localStorage.getItem('sessionId')) {
@@ -181,8 +182,14 @@ export class Tab1Page {
       message: `<img src="${this.qrUrl}"/>`,
       buttons: ['OK']
     });
-
     await alert.present();
+    
+    const toast = await this.toastController.create({
+      header: 'Copied invite to clipboard.',
+      duration: 5000,
+      buttons: ['Dismiss']
+    });
+    await toast.present();
   }
 
   // TODO: Remove user from list of users when leaving
@@ -258,6 +265,8 @@ export class Tab1Page {
   toggleQr() {
     if (!this.showQr) {
       this.qrAlert();
+      const inviteUrl =  window.location.origin + `/login?sessionID=${localStorage.getItem(LocalStorageEnum.SessionId)}`;
+      this.clipboard.copy(inviteUrl);
     } else {
       this.showQr = !this.showQr;
       this.showOrHide = (this.showQr) ? ShowOrHide.Hide : ShowOrHide.Show;
