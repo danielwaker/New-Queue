@@ -1,13 +1,17 @@
 :host {
     .buttons {
         display: flex;
-        flex-direction: column;
-        align-items: center;
+        justify-content: center;
     }
 
     .qr {
         height: 10rem;
         width: 10rem;
+    }
+
+    .qr-container {
+        display: flex;
+        justify-content: center;
     }
 
     // .track {
@@ -40,7 +44,17 @@
         padding: 0.5rem;
     }
 
+    .refresh {
+        width: 2rem;
+        height: 2rem;
+        padding: 0.5rem;
+    }
+
     ion-item-sliding {
         //height: 2rem;
+    }
+
+    .button-width {
+        width: 100%;
     }
 }

@@ -1,28 +1,26 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 1
-    </ion-title>
-    <ion-buttons *ngIf="users" slot="end">
+    <ion-buttons *ngIf="users" slot="start">
       <ion-button (click)="startQueue()">start queue</ion-button>
     </ion-buttons>
+    <ion-icon button name="refresh-circle-outline" slot="end" class="refresh" (click)="refresh()"></ion-icon>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
+  <!-- <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Tab 1</ion-title>
     </ion-toolbar>
-  </ion-header>
+  </ion-header> -->
 
   <app-explore-container class="container" name="Front Page"></app-explore-container>
   <div class="buttons">
-    <ion-button (click)="session()">{{sessionStatus}} Session</ion-button>
-    <ion-button *ngIf="sessionStatus !== 'Create'" (click)="toggleQr()">{{showOrHide}} QR Code</ion-button>
-    <div *ngIf="showQr">
-      <img class="qr" [src]="qrUrl"/>
-    </div>
+    <ion-button class="button-width" (click)="session()">{{sessionStatus}} Session</ion-button>
+    <ion-button class="button-width" *ngIf="sessionStatus !== 'Create'" (click)="toggleQr()">{{showOrHide}} QR Code</ion-button>    
+  </div>
+  <div class="qr-container" *ngIf="showQr">
+    <img class="qr" [src]="qrUrl"/>
   </div>
   <div *ngIf="queue && queue.length > 0">
     <ion-list>
@@ -42,4 +40,4 @@
     </ion-list>
   </div>
 </ion-content>
-<app-player (skipQueue)="startQueue()" [leader]="leader"></app-player>
+<app-player (skipQueue)="startQueue()" [leader]="leader" [queue]="queue"></app-player>

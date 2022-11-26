@@ -1,11 +1,13 @@
 /// <reference types="@types/spotify-api" />
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CreateSession, Song, User } from '../interfaces';
 import * as signalR from '@microsoft/signalr';  
 import { PlayerComponent } from '../player/player.component';
 import { environment } from 'src/environments/environment';
 import { SessionEnum, LocalStorageEnum, ShowOrHide } from '../enums';
+import { AlertController, ToastController } from '@ionic/angular';
+import { Clipboard } from '@awesome-cordova-plugins/clipboard/ngx';
 
 @Component({
   selector: 'app-tab1',
@@ -25,7 +27,7 @@ export class Tab1Page {
   public showQr = false;
   public showOrHide = ShowOrHide.Show;
 
-  constructor(private _http: HttpClient) { }
+  constructor(private _http: HttpClient, private alertController: AlertController, private toastController: ToastController, private clipboard: Clipboard) { }
 
   ngOnInit() {
     if (localStorage.getItem('sessionId')) {
@@ -142,6 +144,7 @@ export class Tab1Page {
   }
 
   async createSession() {
+    await this.createQueueAlert();
     const bearer = 'Bearer ' + localStorage.getItem("access_token");
     const headers = { "Accept": "application/json",
     "Content-Type": "application/json",
@@ -163,6 +166,30 @@ export class Tab1Page {
       localStorage.setItem(LocalStorageEnum.SessionId, sessionId);
       this.getUsers();
     });
+  }
+
+  async createQueueAlert() {
+    const alert = await this.alertController.create({
+      message: 'Please remove any items from the queue in your Spotify app before starting queue.',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+  }
+
+  async qrAlert() {
+    const alert = await this.alertController.create({
+      message: `<img src="${this.qrUrl}"/>`,
+      buttons: ['OK']
+    });
+    await alert.present();
+    
+    const toast = await this.toastController.create({
+      header: 'Copied invite to clipboard.',
+      duration: 5000,
+      buttons: ['Dismiss']
+    });
+    await toast.present();
   }
 
   // TODO: Remove user from list of users when leaving
@@ -236,7 +263,18 @@ export class Tab1Page {
   }
 
   toggleQr() {
-    this.showQr = !this.showQr;
-    this.showOrHide = (this.showQr) ? ShowOrHide.Hide : ShowOrHide.Show;
+    if (!this.showQr) {
+      this.qrAlert();
+      const inviteUrl =  window.location.origin + `/login?sessionID=${localStorage.getItem(LocalStorageEnum.SessionId)}`;
+      this.clipboard.copy(inviteUrl);
+      navigator.clipboard.writeText(inviteUrl);
+    } else {
+      this.showQr = !this.showQr;
+      this.showOrHide = (this.showQr) ? ShowOrHide.Hide : ShowOrHide.Show;
+    }
+  }
+
+  refresh() {
+    this.player.refresh();
   }
 }
