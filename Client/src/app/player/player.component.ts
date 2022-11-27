@@ -122,7 +122,7 @@ export class PlayerComponent implements OnInit {
     this.skipQueue.emit();
   }
 
-  toggleProgress(event: RangeCustomEvent) {
+  toggleProgress(event: any) {
     console.log("toggle", (event.detail.value as number / 100) * this.currentSong.duration_ms);
     console.log("progress stopped: ", this.progressStopped);
     this.progressStopped = !this.progressStopped;
