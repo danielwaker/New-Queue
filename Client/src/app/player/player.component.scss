@@ -4,10 +4,12 @@
         width: 2rem;
         height: 2rem;
     }
+
     .currently-playing {
         display: flex;
         align-items: center;
     }
+
     .track-name {
         margin: 0 0.5rem;
         text-overflow: ellipsis;
@@ -15,6 +17,7 @@
         white-space: nowrap;
         width: 15rem;
     }
+
     .track-time {
         margin-right: 0.5rem;
     }
@@ -23,7 +26,19 @@
         --inner-padding-end: 0;
         --padding-start: 0;
     }
+
     .buttons {
         display: inherit;
+    }
+
+    ion-range {
+        --knob-size: 16px;
+        padding-inline: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0;
+    }
+
+    ion-range::part(pin) {
+        padding-inline: 0;
     }
 }

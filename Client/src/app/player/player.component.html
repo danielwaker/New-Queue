@@ -1,9 +1,14 @@
 <ion-footer>
   <ion-item>
+    <ion-range *ngIf="currentSong" (ionKnobMoveStart)="toggleProgress($event)" (ionKnobMoveEnd)="toggleProgress($event)" [value]="progressPercent" [step]="0.1" [pin]="true" [max]="setMax()" [pinFormatter]="pinFormatter">
+      <div class="" slot="start">{{progress | date:'m:ss'}}</div>
+      <div class="" slot="end">{{currentSong.duration_ms | date:'m:ss'}}</div>  
+    </ion-range>
+  </ion-item>
+  <ion-item>
     <div *ngIf="currentSong" class="currently-playing">
       <img [src]="currentSong.album.images[2].url"/>
       <div class="track-name">{{currentSong.artists[0].name}} - {{currentSong.name}}</div>
-      <div class="track-time">{{progress | date:'m:ss'}} / {{currentSong.duration_ms | date:'m:ss'}}</div>
     </div>
     <div *ngIf="leader" class="buttons">
       <ion-icon *ngIf="isPlaying; else elseBlock" button name="pause-circle-outline" (click)="playPause(ePlayPause.pause)"></ion-icon>

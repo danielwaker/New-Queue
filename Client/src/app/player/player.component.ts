@@ -1,7 +1,8 @@
 /// <reference types="@types/spotify-api" />
+import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { empty } from 'rxjs';
+import { RangeCustomEvent } from '@ionic/core';
 import { PlayPause } from '../enums';
 
 @Component({
@@ -18,6 +19,9 @@ export class PlayerComponent implements OnInit {
   public currentSong: SpotifyApi.TrackObjectFull;
   public previousSong: SpotifyApi.TrackObjectFull;
   public progress: number;
+  public progressPercent;
+  public progressStopped = false;
+  public startingProgress: number;
   public interval: NodeJS.Timeout;
   public paused = false;
   private playerURL = 'https://api.spotify.com/v1/me/player/';
@@ -47,6 +51,7 @@ export class PlayerComponent implements OnInit {
         this.currentSong = playback.item as SpotifyApi.TrackObjectFull;
         this.previousSong = this.currentSong;
         this.progress = playback.progress_ms;
+        this.progressPercent = { upper: this.progress };
         console.log(playback);
         console.log("IS PLAYING", this.isPlaying);
         if (this.isPlaying && this.interval == null) {
@@ -80,11 +85,12 @@ export class PlayerComponent implements OnInit {
       } else if ((progress + 1000) < duration) {
         progress += 1000;
         this.progress = progress;
+        this.progressPercent = (!this.progressStopped) ? { upper: this.progress } : this.progressPercent;
         //console.log("progressing");
       } else {
         clearInterval(this.interval);
         this.progress = 0;
-        if (this.queue.length > 0) {
+        if (this.queue?.length > 0) {
           this.skipQueue.emit();
         } else {
           this.setCurrentSong();
@@ -114,6 +120,40 @@ export class PlayerComponent implements OnInit {
 
   nextSong() {
     this.skipQueue.emit();
+  }
+
+  toggleProgress(event: RangeCustomEvent) {
+    console.log("toggle", (event.detail.value as number / 100) * this.currentSong.duration_ms);
+    console.log("progress stopped: ", this.progressStopped);
+    this.progressStopped = !this.progressStopped;
+    if (!this.progressStopped) {
+      if (this.startingProgress != event.detail.value) {
+        const newProgress = Math.round(event.detail.value as number);
+        const headers = this.headers();
+        const params = {
+          position_ms: newProgress
+        }
+        this._http.put<any>(this.playerURL + "seek", {}, { params, headers }).subscribe((bruh) => {
+          clearInterval(this.interval);
+          this.progress = newProgress;
+          this.progressPercent = { upper: this.progress }
+          this.startTimer(this.currentSong.duration_ms, this.progress);
+          console.log(bruh);
+        }, (error) => {
+          console.log(error);
+        });
+      }
+    } else {
+      this.startingProgress = event.detail.value as number;
+    }
+  }
+
+  pinFormatter = (value: any) => {
+    return formatDate(value,'mm:ss','en-US');
+  }
+
+  setMax() {
+    return this.currentSong.duration_ms;
   }
 
   headers(): any {
