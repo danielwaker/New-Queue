@@ -6,7 +6,7 @@ import * as signalR from '@microsoft/signalr';
 import { PlayerComponent } from '../player/player.component';
 import { environment } from 'src/environments/environment';
 import { SessionEnum, LocalStorageEnum, ShowOrHide } from '../enums';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, Platform, ToastController } from '@ionic/angular';
 import { Clipboard } from '@awesome-cordova-plugins/clipboard/ngx';
 
 @Component({
@@ -27,9 +27,17 @@ export class Tab1Page {
   public showQr = false;
   public showOrHide = ShowOrHide.Show;
 
-  constructor(private _http: HttpClient, private alertController: AlertController, private toastController: ToastController, private clipboard: Clipboard) { }
+  constructor(private platform: Platform, private _http: HttpClient, private alertController: AlertController, private toastController: ToastController, private clipboard: Clipboard) { }
 
   ngOnInit() {
+    this.platform.resume.subscribe(async (res) => {
+      const toast = await this.toastController.create({
+        header: 'Resumed.',
+        duration: 5000,
+        buttons: ['Dismiss']
+      });
+      await toast.present();
+    });
     if (localStorage.getItem('sessionId')) {
       this.getUsers(true);
       this.qrUrl = localStorage.getItem('qr');
