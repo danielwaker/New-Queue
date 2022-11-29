@@ -1,6 +1,6 @@
 /// <reference types="@types/spotify-api" />
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, HostListener, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { CreateSession, Song, User } from '../interfaces';
 import * as signalR from '@microsoft/signalr';  
 import { PlayerComponent } from '../player/player.component';
@@ -29,25 +29,18 @@ export class Tab1Page {
 
   constructor(private _http: HttpClient, private alertController: AlertController, private toastController: ToastController, private clipboard: Clipboard) { }
 
-  @HostListener('window:pageshow', ['$event'])
-  async showToast() {
-      const toast = await this.toastController.create({
-        header: 'Resumed.',
-        duration: 5000,
-        buttons: ['Dismiss']
-      });
-      await toast.present();
-  }
-
   ngOnInit() {
-    // window.addEventListener("pageshow", async () => {
-    //   const toast = await this.toastController.create({
-    //     header: 'Resumed.',
-    //     duration: 5000,
-    //     buttons: ['Dismiss']
-    //   });
-    //   await toast.present();
-    // });
+    document.addEventListener("visibilitychange", async () => {
+      if (!document.hidden) {
+        const toast = await this.toastController.create({
+          header: 'Resumed.',
+          duration: 5000,
+          buttons: ['Dismiss']
+        });
+        await toast.present();
+      }
+    });
+
     if (localStorage.getItem('sessionId')) {
       this.getUsers(true);
       this.qrUrl = localStorage.getItem('qr');
