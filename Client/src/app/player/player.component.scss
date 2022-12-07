@@ -28,7 +28,7 @@
     }
 
     .buttons {
-        display: inherit;
+        display: inline-flex;
     }
 
     ion-range {
@@ -36,6 +36,10 @@
         padding-inline: 1rem;
         padding-top: 0.5rem;
         padding-bottom: 0;
+
+        .timer {
+            font-variant-numeric: tabular-nums;
+        }
     }
 
     ion-range::part(pin) {
