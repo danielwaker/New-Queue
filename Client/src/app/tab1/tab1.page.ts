@@ -126,8 +126,6 @@ export class Tab1Page {
         localStorage.removeItem("sessionId");
       } else {
         this.leader = this.users[localStorage.getItem('user')].Leader;
-        this.log('user: ' + localStorage.getItem('user'));
-        this.log('leader: ' + this.users[localStorage.getItem('user')].Leader);
         this.sessionStatus = (this.leader) ? SessionEnum.End : SessionEnum.Leave;
         if (getQueue) {
           this.getQueue();
