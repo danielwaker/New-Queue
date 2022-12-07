@@ -29,6 +29,11 @@ export class PlayerComponent implements OnInit {
 
   ngOnInit() {
     this.setCurrentSong();
+    document.addEventListener("visibilitychange", async () => {
+      if (!document.hidden) {
+        this.refresh();
+      }
+    });
   }
 
   refresh() {

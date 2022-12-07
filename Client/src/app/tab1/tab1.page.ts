@@ -30,16 +30,6 @@ export class Tab1Page {
   constructor(private _http: HttpClient, private alertController: AlertController, private toastController: ToastController, private clipboard: Clipboard) { }
 
   ngOnInit() {
-    document.addEventListener("visibilitychange", async () => {
-      if (!document.hidden) {
-        const toast = await this.toastController.create({
-          header: 'Resumed.',
-          duration: 5000,
-          buttons: ['Dismiss']
-        });
-        await toast.present();
-      }
-    });
 
     if (localStorage.getItem('sessionId')) {
       this.getUsers(true);
