@@ -135,11 +135,13 @@ namespace Server.Controllers
         }
 
         [HttpPost("RemoveSong")]
-        public void RemoveSong(string sessionID, int songIndex)
+        public async Task<IActionResult> RemoveSong(string sessionID, int songIndex)
         {
             Session session = DeserializeSession(sessionID);
             session.RemoveSong(songIndex);
             ReserializeSession(sessionID, session);
+            await _hubContext.Clients.Group(sessionID).BroadcastQueue();
+            return NoContent();
         }
 
         [HttpGet("GetSong")]
