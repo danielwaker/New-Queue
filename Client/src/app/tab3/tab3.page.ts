@@ -61,4 +61,8 @@ export class Tab3Page {
       this.backendLog = error;
     });
   }
+
+  removeLeader() {
+    localStorage.setItem("leader", "false");
+  }
 }

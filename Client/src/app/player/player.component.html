@@ -1,6 +1,6 @@
 <ion-footer>
   <ion-item>
-    <ion-range *ngIf="currentSong" (ionKnobMoveStart)="toggleProgress($event)" (ionKnobMoveEnd)="toggleProgress($event)" [value]="progressPercent" [step]="0.1" [pin]="true" [max]="setMax()" [pinFormatter]="pinFormatter">
+    <ion-range *ngIf="currentSong" (ionKnobMoveStart)="toggleProgress($event)" (ionKnobMoveEnd)="toggleProgress($event)" [value]="progressPercent" [step]="0.1" [pin]="true" [max]="setMax()" [pinFormatter]="pinFormatter" [disabled]="!leader">
       <div class="timer" slot="start">{{progress | date:'m:ss'}}</div>
       <div class="timer" slot="end">{{currentSong.duration_ms | date:'m:ss'}}</div>  
     </ion-range>

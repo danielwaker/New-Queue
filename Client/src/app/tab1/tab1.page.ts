@@ -29,6 +29,10 @@ export class Tab1Page {
 
   constructor(private _http: HttpClient, private alertController: AlertController, private toastController: ToastController, private clipboard: Clipboard) { }
 
+  ionViewWillEnter() {
+    this.leader = localStorage.getItem('leader') != 'false';
+  }
+
   ngOnInit() {
 
     if (localStorage.getItem('sessionId')) {
@@ -133,6 +137,7 @@ export class Tab1Page {
         localStorage.removeItem("sessionId");
       } else {
         this.leader = this.users[localStorage.getItem('user')].Leader;
+        localStorage.setItem("leader", String(this.leader));
         this.sessionStatus = (this.leader) ? SessionEnum.End : SessionEnum.Leave;
         if (getQueue) {
           this.getQueue();
