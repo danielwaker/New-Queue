@@ -6,5 +6,6 @@ namespace Server
     {
         Task BroadcastQueue();
         Task BroadcastUsers();
+        Task BroadcastPlayback();
     }
 }

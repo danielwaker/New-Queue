@@ -5,8 +5,8 @@
       <div class="timer" slot="end">{{currentSong.duration_ms | date:'m:ss'}}</div>  
     </ion-range>
   </ion-item>
-  <ion-item>
-    <div *ngIf="currentSong" class="currently-playing">
+  <ion-item *ngIf="currentSong">
+    <div class="currently-playing">
       <img [src]="currentSong.album.images[2].url"/>
       <div class="track-name">{{currentSong.artists[0].name}} - {{currentSong.name}}</div>
     </div>

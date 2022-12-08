@@ -50,6 +50,8 @@ export class Tab1Page {
     }).catch(function (err) {  
       return console.error(err.toString());  
     });
+
+    //NOTE: when adding a new connection, you MUST rebuild the Ionic app
   
     this.connection.on("BroadcastQueue", () => {  
       console.log("Notification");
@@ -59,6 +61,11 @@ export class Tab1Page {
     this.connection.on("BroadcastUsers", () => {  
       console.log("Notification");
       this.getUsers();
+    });
+
+    this.connection.on("BroadcastPlayback", () => {
+      console.log("Notification");
+      this.player.outsideUserPlayPause();
     });
   }
 

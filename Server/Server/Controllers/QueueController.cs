@@ -150,6 +150,13 @@ namespace Server.Controllers
             return track;
         }
 
+        [HttpPost("Playback")]
+        public async Task<IActionResult> Playback(string sessionID)
+        {
+            await _hubContext.Clients.Group(sessionID).BroadcastPlayback();
+            return NoContent();
+        }
+
         [HttpGet("Callback")]
         public async Task<IActionResult> Callback(string code, string state)
         {

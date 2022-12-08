@@ -3,6 +3,7 @@ import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { RangeCustomEvent } from '@ionic/core';
+import { environment } from 'src/environments/environment';
 import { PlayPause } from '../enums';
 
 @Component({
@@ -24,6 +25,7 @@ export class PlayerComponent implements OnInit {
   public startingProgress: number;
   public interval: NodeJS.Timeout;
   public paused = false;
+  public isUserFlippingPlayback = false;
   private playerURL = 'https://api.spotify.com/v1/me/player/';
   constructor(private _http: HttpClient) { }
 
@@ -110,7 +112,14 @@ export class PlayerComponent implements OnInit {
     const headers = this.headers();
     console.log("playpause" + playPause);
     console.log(this.playerURL + playPause);
+    this.isUserFlippingPlayback = true;
     this._http.put<any>(this.playerURL + playPause, {}, { headers }).subscribe(() => {
+      const params = {
+        sessionID: localStorage.getItem('sessionId')
+      };
+      this._http.post(environment.apiUrl + 'Queue/Playback/', {}, { params }).subscribe(data => {
+        console.log(data);
+      });
       this.paused = (playPause == PlayPause.play) ? false : true;
       if (playPause == PlayPause.play && this.interval == null) {
         this.setCurrentSong();
@@ -121,6 +130,15 @@ export class PlayerComponent implements OnInit {
       this.playPause(flip);
     });
     this.isPlaying = !this.isPlaying;
+  }
+
+  outsideUserPlayPause() {
+    if (this.isUserFlippingPlayback) {
+      this.isUserFlippingPlayback = false;
+    } else {
+      this.paused = !this.paused;
+      this.isPlaying = !this.isPlaying;
+    }
   }
 
   nextSong() {
