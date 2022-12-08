@@ -7,7 +7,7 @@
   </ion-item>
   <ion-item *ngIf="currentSong">
     <div class="currently-playing">
-      <img [src]="currentSong.album.images[2].url"/>
+      <img [src]="currentSong.album.images[1].url"/>
       <div class="track-name">{{currentSong.artists[0].name}} - {{currentSong.name}}</div>
     </div>
     <div *ngIf="leader" class="buttons">
