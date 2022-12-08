@@ -23,6 +23,8 @@ namespace Server.Controllers
     {
         private readonly IHubContext<BroadcastHub, IHubClient> _hubContext;
         private readonly IConfiguration _iConfig;
+        private static Dictionary<string, object> sessionLocks = new Dictionary<string, object>();
+
         public QueueController(IHubContext<BroadcastHub, IHubClient> hubContext, IConfiguration iConfig)
         {
             _hubContext = hubContext;
@@ -46,11 +48,13 @@ namespace Server.Controllers
         }
 
         [HttpPost("EndSession")]
-        public void EndSession(string sessionID)
+        public async Task<IActionResult> EndSession(string sessionID)
         {
             string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
             string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
             System.IO.File.Delete(path);
+            await _hubContext.Clients.Group(sessionID).BroadcastEnd();
+            return NoContent();
         }
 
         /// <summary>
@@ -178,8 +182,23 @@ namespace Server.Controllers
         {
             string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
             string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
-            var jsonString = (System.IO.File.Exists(path)) ? System.IO.File.ReadAllText(path) : "{}";
-            return JsonSerializer.Deserialize<Session>(jsonString);
+            if (!sessionLocks.ContainsKey(sessionID))
+            {
+                sessionLocks[sessionID] = new object();
+            }
+            lock (sessionLocks[sessionID])
+            {
+                var jsonString = "{}";
+                if (System.IO.File.Exists(path))
+                {
+                    using (FileStream fs = System.IO.File.Open(path, FileMode.Open, FileAccess.Read, FileShare.None))
+                    using (var sr = new StreamReader(fs))
+                    {
+                        jsonString = sr.ReadToEnd();
+                    }
+                }
+                return JsonSerializer.Deserialize<Session>(jsonString);
+            }
         }
 
         private void ReserializeSession(string sessionID, Session session)
@@ -188,11 +207,14 @@ namespace Server.Controllers
             {
                 string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
                 string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
-                using (FileStream fs = System.IO.File.Open(path, FileMode.Create))
+                lock (sessionLocks[sessionID])
                 {
-                    var options = new JsonSerializerOptions { WriteIndented = true };
-                    byte[] info = JsonSerializer.SerializeToUtf8Bytes(session, options);
-                    fs.Write(info, 0, info.Length);
+                    using (FileStream fs = System.IO.File.Open(path, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+                    {
+                        var options = new JsonSerializerOptions { WriteIndented = true };
+                        byte[] info = JsonSerializer.SerializeToUtf8Bytes(session, options);
+                        fs.Write(info, 0, info.Length);
+                    }
                 }
             }
         }

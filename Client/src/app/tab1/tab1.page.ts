@@ -71,6 +71,11 @@ export class Tab1Page {
       console.log("Notification");
       this.player.outsideUserPlayPause();
     });
+
+    this.connection.on("BroadcastEnd", () => {
+      console.log("Notification");
+      this.leaveSession();
+    });
   }
 
   async addUser() {
