@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using QRCoder;
 using SpotifyAPI.Web;
 using System;
@@ -21,14 +22,16 @@ namespace Server.Controllers
     [Route("[controller]")]
     public class QueueController : ControllerBase
     {
+        private readonly ILogger<QueueController> _logger;
         private readonly IHubContext<BroadcastHub, IHubClient> _hubContext;
         private readonly IConfiguration _iConfig;
         private static Dictionary<string, object> sessionLocks = new Dictionary<string, object>();
 
-        public QueueController(IHubContext<BroadcastHub, IHubClient> hubContext, IConfiguration iConfig)
+        public QueueController(IHubContext<BroadcastHub, IHubClient> hubContext, IConfiguration iConfig, ILogger<QueueController> logger)
         {
             _hubContext = hubContext;
             _iConfig = iConfig;
+            _logger = logger;
         }
 
         [HttpGet("CreateSession")]
@@ -52,7 +55,18 @@ namespace Server.Controllers
         {
             string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
             string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
-            System.IO.File.Delete(path);
+
+            try
+            {
+                lock (sessionLocks[sessionID])
+                {
+                    System.IO.File.Delete(path);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
             await _hubContext.Clients.Group(sessionID).BroadcastEnd();
             return NoContent();
         }
