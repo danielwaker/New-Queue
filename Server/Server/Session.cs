@@ -101,6 +101,13 @@ namespace Server
             songs.Capacity = songs.Capacity - 1;
         }
 
+        public void Reorder(int songIndex, int newIndex)
+        {
+            Song song = songs[songIndex];
+            songs.RemoveAt(songIndex);
+            songs.Insert(newIndex, song);
+        }
+
         public List<Song> GetSongs()
         {
             return songs;

@@ -27,7 +27,10 @@
     }
 
     .track-data {
-        display: contents;
+        display: inline-block;
+        width: 100%;
+        --padding-start: 0;
+        --inner-padding-end: 0;
     }
 
     .track-name {
@@ -42,6 +45,9 @@
 
     .track-cover {
         padding: 0.5rem;
+        padding-left: 0;
+        width: 4.5rem;
+        margin-left: 1.25rem;
     }
 
     .refresh {
@@ -56,5 +62,9 @@
 
     .button-width {
         width: 100%;
+    }
+
+    .outer-item {
+        --inner-padding-end: 0;
     }
 }

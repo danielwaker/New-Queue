@@ -24,19 +24,24 @@
   </div>
   <div *ngIf="queue && queue.length > 0">
     <ion-list>
-      <ion-item-sliding *ngFor="let track of queue; index as i" [disabled]="!leader">
-        <ion-item>
-          <ion-item #user class="track-user" (appColor)="getColor(track[1], user)">{{track[1]}}</ion-item>
-          <ion-item class="track-data">
-            <img class="track-cover" [src]="track[0].album.images[2].url"/>
-            <div class="track-name">{{track[0].artists[0].name}} - {{track[0].name}}</div>
-            <div class="track-time">{{track[0].duration_ms | date:'m:ss'}}</div>
+      <ion-reorder-group [disabled]="!leader" (ionItemReorder)="handleReorder($any($event))">
+        <ion-item-sliding [disabled]="!leader" *ngFor="let track of queue; index as i">
+          <ion-item class="outer-item">
+            <ion-item #user class="track-user" (appColor)="getColor(track[1], user)">{{track[1]}}</ion-item>
+            <ion-item class="track-data">
+              <img class="track-cover" [src]="track[0].album.images[1].url"/>
+              <div class="track-name">{{track[0].artists[0].name}} - {{track[0].name}}</div>
+              <div class="track-time">{{track[0].duration_ms | date:'m:ss'}}</div>
+            <ion-reorder slot="end">
+              <!-- <ion-icon name="pizza"></ion-icon> -->
+            </ion-reorder>
+            </ion-item>
           </ion-item>
-        </ion-item>
-        <ion-item-options>
-          <ion-item-option color="success" (click)="removeSong(i)">Delete</ion-item-option>
-        </ion-item-options>
-      </ion-item-sliding>
+          <ion-item-options>
+            <ion-item-option color="success" (click)="removeSong(i)">Delete</ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>      
+      </ion-reorder-group>
     </ion-list>
   </div>
 </ion-content>

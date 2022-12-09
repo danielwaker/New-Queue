@@ -6,7 +6,7 @@ import * as signalR from '@microsoft/signalr';
 import { PlayerComponent } from '../player/player.component';
 import { environment } from 'src/environments/environment';
 import { SessionEnum, LocalStorageEnum, ShowOrHide } from '../enums';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, ItemReorderEventDetail, ToastController } from '@ionic/angular';
 import { Clipboard } from '@awesome-cordova-plugins/clipboard/ngx';
 
 @Component({
@@ -274,6 +274,19 @@ export class Tab1Page {
       console.log(data);
       this.queue.splice(index, 1);
     });
+  }
+
+  handleReorder(ev: CustomEvent<ItemReorderEventDetail>) {
+    const params = {
+      sessionID: localStorage.getItem('sessionId'),
+      songIndex: ev.detail.from,
+      newIndex: ev.detail.to
+    };
+    this._http.post(environment.apiUrl + 'Queue/ReorderQueue/', {}, { params }).subscribe((data) => {
+      console.log(data);
+    });
+    console.log('Dragged from index', ev.detail.from, 'to', ev.detail.to);
+    ev.detail.complete();
   }
 
   getColor(user: string, el: any) {

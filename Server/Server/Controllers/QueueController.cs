@@ -162,6 +162,16 @@ namespace Server.Controllers
             return NoContent();
         }
 
+        [HttpPost("ReorderQueue")]
+        public async Task<IActionResult> ReorderQueue(string sessionID, int from, int songIndex, int newIndex)
+        {
+            Session session = DeserializeSession(sessionID);
+            session.Reorder(songIndex, newIndex);
+            ReserializeSession(sessionID, session);
+            await _hubContext.Clients.Group(sessionID).BroadcastQueue();
+            return NoContent();
+        }
+
         [HttpGet("GetSong")]
         public async Task<object> GetSong(string token, string song)
         {
