@@ -225,7 +225,7 @@ export class Tab1Page {
     location.reload();
   }
 
-  startQueue() {
+  startQueue(putPlay = false) {
     const bearer = 'Bearer ' + localStorage.getItem("access_token");
     const headers = { "Accept": "application/json",
     "Content-Type": "application/json",
@@ -236,10 +236,10 @@ export class Tab1Page {
       };
       if (!this.player.isPlaying) {
         this._http.put<any>('https://api.spotify.com/v1/me/player/play', {}, { headers }).subscribe((data) => {
-          this.startQueueUtility();
+          this.startQueueUtility(putPlay);
         });
       } else {
-        this.startQueueUtility();
+        this.startQueueUtility(putPlay);
       }
     } else {
       this._http.post<any>('https://api.spotify.com/v1/me/player/next', {}, { headers }).subscribe((data) => {
@@ -248,21 +248,33 @@ export class Tab1Page {
     }
   }
 
-  startQueueUtility() {
+  startQueueUtility(putPlay = false) {
     const bearer = 'Bearer ' + localStorage.getItem("access_token");
     const headers = { "Accept": "application/json",
     "Content-Type": "application/json",
     "Authorization": bearer};
+    const body = {
+      uris: [this.queue[0][0].uri]
+    };
     const params = {
       uri: this.queue[0][0].uri
     };
-    this._http.post<any>('https://api.spotify.com/v1/me/player/queue', {}, { params, headers }).subscribe((data) => {
-      this._http.post<any>('https://api.spotify.com/v1/me/player/next', {}, { headers }).subscribe((data) => {
-        console.log("next");
+    if (putPlay) {
+      console.log(body);
+      this._http.put<any>('https://api.spotify.com/v1/me/player/play', body, {  headers }).subscribe((data) => {
+        console.log("PUTPLAY");
         this.player.setCurrentSong(this.queue[0][0]);
         this.removeSong(0);
       });
-    });
+    } else {
+      this._http.post<any>('https://api.spotify.com/v1/me/player/queue', {}, { params, headers }).subscribe((data) => {
+        this._http.post<any>('https://api.spotify.com/v1/me/player/next', {}, { headers }).subscribe((data) => {
+          console.log("next");
+          this.player.setCurrentSong(this.queue[0][0]);
+          this.removeSong(0);
+        });
+      });
+    }
   }
 
   removeSong(index: number) {

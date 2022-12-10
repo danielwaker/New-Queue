@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons *ngIf="users" slot="start">
-      <ion-button (click)="startQueue()">start queue</ion-button>
+      <ion-button (click)="startQueue(true)">start queue</ion-button>
     </ion-buttons>
     <ion-icon button name="refresh-circle-outline" slot="end" class="refresh" (click)="refresh()"></ion-icon>
   </ion-toolbar>

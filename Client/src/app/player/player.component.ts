@@ -46,7 +46,7 @@ export class PlayerComponent implements OnInit {
 
   setCurrentSong(playing: SpotifyApi.TrackObjectFull = null) {
     if (playing == null) {
-      const headers = this.headers(); 
+      const headers = this.headers();
       this._http.get<any>(this.playerURL, { headers }).subscribe((playback: SpotifyApi.CurrentlyPlayingObject) => {
         if (this.currentSong != null && playback.item.id == this.currentSong.id && playback.item.duration_ms == this.currentSong.duration_ms) {
           this.setCurrentSong();
@@ -100,7 +100,7 @@ export class PlayerComponent implements OnInit {
         if (this.queue?.length > 0) {
           this.skipQueue.emit();
         } else {
-          this.setCurrentSong();
+          //this.setCurrentSong();
         }
         console.log("reset timer");
       }
