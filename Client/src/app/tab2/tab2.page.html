@@ -21,7 +21,7 @@
   <div *ngIf="tracks && tracks.length > 0">
     <ion-list>
       <ion-item *ngFor="let track of tracks; index as i; trackBy: searchTrackBy" button (click)="queue(track)">
-        <img [src]="track.album.images[2].url"/>
+        <img [src]="track.album.images[1].url"/>
         <div class="track-name">{{track.artists[0].name}} - {{track.name}}</div>
         <div class="track-time">{{track.duration_ms | date:'m:ss'}}</div>
       </ion-item>
