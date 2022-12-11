@@ -100,7 +100,7 @@ export class PlayerComponent implements OnInit {
         if (this.queue?.length > 0) {
           this.skipQueue.emit();
         } else {
-          //this.setCurrentSong();
+          this.setCurrentSong();
         }
         console.log("reset timer");
       }
