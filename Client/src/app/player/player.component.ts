@@ -97,7 +97,7 @@ export class PlayerComponent implements OnInit {
       } else {
         clearInterval(this.interval);
         this.progress = 0;
-        if (this.queue?.length > 0) {
+        if (this.queue?.length > 0 && this.leader) {
           this.skipQueue.emit();
         } else {
           //this.setCurrentSong();
