@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { BackgroundMode } from '@awesome-cordova-plugins/background-mode/ngx';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,7 @@ import { Component } from '@angular/core';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor() {}
+  constructor(public backgroundMode: BackgroundMode) {
+    this.backgroundMode.enable();
+  }
 }
