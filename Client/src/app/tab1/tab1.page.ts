@@ -141,7 +141,7 @@ export class Tab1Page {
       if (data === null) {
         localStorage.removeItem("sessionId");
       } else {
-        this.leader = this.users[localStorage.getItem('user')].Leader;
+        this.leader = this.users[localStorage.getItem('user')].leader;
         localStorage.setItem("leader", String(this.leader));
         this.sessionStatus = (this.leader) ? SessionEnum.End : SessionEnum.Leave;
         if (getQueue) {
@@ -302,7 +302,7 @@ export class Tab1Page {
   }
 
   getColor(user: string, el: any) {
-    el.el.style.setProperty('--background', this.users[user].Color);
+    el.el.style.setProperty('--background', this.users[user].color);
   }
 
   toggleQr() {

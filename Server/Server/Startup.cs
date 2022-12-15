@@ -36,6 +36,7 @@ namespace Server
             services.Configure<SessionDatabaseSettings>(Configuration.GetSection(nameof(SessionDatabaseSettings)));
             services.AddSingleton<ISessionDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<SessionDatabaseSettings>>().Value);
+            services.AddSingleton<SessionService>();
 
             services.AddCors(options =>
             {

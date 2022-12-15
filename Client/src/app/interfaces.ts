@@ -9,7 +9,7 @@ export interface Song {
 }
 
 export interface User {
-    Songs: number,
-    Color: string,
-    Leader: boolean
+    songs: number,
+    color: string,
+    leader: boolean
 }

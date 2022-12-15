@@ -25,10 +25,12 @@ namespace Server.Controllers
         private readonly ILogger<QueueController> _logger;
         private readonly IHubContext<BroadcastHub, IHubClient> _hubContext;
         private readonly IConfiguration _iConfig;
+        private readonly SessionService _sessionService;
         private static Dictionary<string, object> sessionLocks = new Dictionary<string, object>();
 
-        public QueueController(IHubContext<BroadcastHub, IHubClient> hubContext, IConfiguration iConfig, ILogger<QueueController> logger)
+        public QueueController(SessionService sessionService, IHubContext<BroadcastHub, IHubClient> hubContext, IConfiguration iConfig, ILogger<QueueController> logger)
         {
+            _sessionService = sessionService;
             _hubContext = hubContext;
             _iConfig = iConfig;
             _logger = logger;
@@ -53,20 +55,7 @@ namespace Server.Controllers
         [HttpPost("EndSession")]
         public async Task<IActionResult> EndSession(string sessionID)
         {
-            string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
-            string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
-
-            try
-            {
-                lock (sessionLocks[sessionID])
-                {
-                    System.IO.File.Delete(path);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-            }
+            _sessionService.Remove(sessionID);
             await _hubContext.Clients.Group(sessionID).BroadcastEnd();
             return NoContent();
         }
@@ -97,24 +86,15 @@ namespace Server.Controllers
 
         private void CreateSessionData(string sessionID, string user)
         {
-            string contentRootPath = (string)AppDomain.CurrentDomain.GetData("ContentRootPath");
-            string path = Path.Combine(contentRootPath, @"Sessions/" + sessionID + ".json");
-
-            using (FileStream fs = System.IO.File.Create(path))
-            {
-                Session hi = new Session(sessionID, user);
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                byte[] info = JsonSerializer.SerializeToUtf8Bytes(hi, options);
-                fs.Write(info, 0, info.Length);
-            }
+            _sessionService.Create(sessionID, user);
         }
 
         [HttpPost("AddSong")]
         public async Task<IActionResult> AddSong(string sessionID, string user, string uri)
         {
-            Session session = DeserializeSession(sessionID);
+            Session session = _sessionService.Get(sessionID);
             session.AddSong(user, uri);
-            ReserializeSession(sessionID, session);
+            _sessionService.Update(sessionID, session);
 
             await _hubContext.Clients.Group(sessionID).BroadcastQueue();
             return NoContent();
@@ -125,9 +105,9 @@ namespace Server.Controllers
         {
             if (!reconnect)
             {
-                Session session = DeserializeSession(sessionID);
+                Session session = _sessionService.Get(sessionID);
                 session.AddUser(user);
-                ReserializeSession(sessionID, session);
+                _sessionService.Update(sessionID, session);
             }
             await _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
             await _hubContext.Clients.Group(sessionID).BroadcastUsers();
@@ -137,27 +117,27 @@ namespace Server.Controllers
         [HttpGet("GetQueue")]
         public List<Song> GetQueue(string sessionID)
         {
-            Session session = DeserializeSession(sessionID);
+            Session session = _sessionService.Get(sessionID);
             List<Song> queue = session.GetSongs();
-            ReserializeSession(sessionID, session);
+            _sessionService.Update(sessionID, session);
             return queue;
         }
 
         [HttpGet("GetUsers")]
         public OrderedDictionary GetUsers(string sessionID)
         {
-            Session session = DeserializeSession(sessionID);
+            Session session = _sessionService.Get(sessionID);
             OrderedDictionary users = session.GetUsers();
-            ReserializeSession(sessionID, session);
+            _sessionService.Update(sessionID, session);
             return users;
         }
 
         [HttpPost("RemoveSong")]
         public async Task<IActionResult> RemoveSong(string sessionID, int songIndex)
         {
-            Session session = DeserializeSession(sessionID);
+            Session session = _sessionService.Get(sessionID);
             session.RemoveSong(songIndex);
-            ReserializeSession(sessionID, session);
+            _sessionService.Update(sessionID, session);
             await _hubContext.Clients.Group(sessionID).BroadcastQueue();
             return NoContent();
         }
@@ -165,9 +145,9 @@ namespace Server.Controllers
         [HttpPost("ReorderQueue")]
         public async Task<IActionResult> ReorderQueue(string sessionID, int from, int songIndex, int newIndex)
         {
-            Session session = DeserializeSession(sessionID);
+            Session session = _sessionService.Get(sessionID);
             session.Reorder(songIndex, newIndex);
-            ReserializeSession(sessionID, session);
+            _sessionService.Update(sessionID, session);
             await _hubContext.Clients.Group(sessionID).BroadcastQueue();
             return NoContent();
         }

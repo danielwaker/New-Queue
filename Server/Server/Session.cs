@@ -85,7 +85,7 @@ namespace Server
                 User = user,
                 Uri = null
             };
-            User userInfo = StupidDeserialization((JsonElement)users[user]);
+            User userInfo = users[user] as User;
             int songCount = userInfo.Songs;
             int songIndex = (songCount + 1) * users.Count + userIndex;
             if (songIndex > songs.Count)
