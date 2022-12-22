@@ -16,13 +16,13 @@ export class Tab2Page {
   private VIRTUAL_QUEUE_FLAG: boolean = true;
   
   private readonly search_endpoint = 'https://api.spotify.com/v1/search?';
+  private readonly queue_endpoint = 'https://api.spotify.com/v1/me/player/queue?';
+  private readonly devices_endpoint = 'https://api.spotify.com/v1/me/player/devices';
   private readonly query = 'q';
   private readonly type = 'type';
   private readonly limit = 'limit';
   private readonly offset_ = 'offset';
-  private readonly queue_endpoint = 'https://api.spotify.com/v1/me/player/queue?';
   private readonly uri = 'uri';
-  private readonly devices_endpoint = 'https://api.spotify.com/v1/me/player/devices';
   public tracks: SpotifyApi.TrackObjectFull[];
   public time: Date;
   public searchQueries = 1;

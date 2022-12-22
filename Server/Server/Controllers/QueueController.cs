@@ -167,6 +167,15 @@ namespace Server.Controllers
             return NoContent();
         }
 
+        [HttpPost("NowPlaying")]
+        public async Task<IActionResult> NowPlaying(string sessionID, string token)
+        {
+            var spotify = new SpotifyClient(token);
+            var currentlyPlaying = await spotify.Player.GetCurrentlyPlaying(new PlayerCurrentlyPlayingRequest());
+            await _hubContext.Clients.Group(sessionID).BroadcastNowPlaying(currentlyPlaying);
+            return NoContent();
+        }
+
         [HttpGet("Callback")]
         public async Task<IActionResult> Callback(string code, string state)
         {

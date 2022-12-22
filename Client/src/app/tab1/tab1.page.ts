@@ -72,6 +72,15 @@ export class Tab1Page {
       this.player.outsideUserPlayPause();
     });
 
+    this.connection.on("BroadcastNowPlaying", (nowPlaying: SpotifyApi.CurrentlyPlayingObject) => {
+      console.log("Notification");
+      console.log(nowPlaying);
+      if (!this.leader) {
+        this.player.setCurrentSong(nowPlaying.item as SpotifyApi.TrackObjectFull);
+        this.getQueue();
+      }
+    });
+
     this.connection.on("BroadcastEnd", () => {
       console.log("Notification");
       this.leaveSession();

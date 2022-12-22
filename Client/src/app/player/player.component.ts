@@ -2,7 +2,6 @@
 import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { RangeCustomEvent } from '@ionic/core';
 import { environment } from 'src/environments/environment';
 import { PlayPause } from '../enums';
 
@@ -48,28 +47,33 @@ export class PlayerComponent implements OnInit {
     if (playing == null) {
       const headers = this.headers();
       this._http.get<any>(this.playerURL, { headers }).subscribe((playback: SpotifyApi.CurrentlyPlayingObject) => {
-        if (this.currentSong != null && playback.item.id == this.currentSong.id && playback.item.duration_ms == this.currentSong.duration_ms) {
+        if (this.currentSong != null && playback.item.id == this.currentSong.id && playback.item.duration_ms == this.currentSong.duration_ms && playback.is_playing) {
           this.setCurrentSong();
-          return;
-        } else if (playback == null) {
-          return;
-        }
-        this.isPlaying = playback.is_playing;
-        this.currentSong = playback.item as SpotifyApi.TrackObjectFull;
-        this.previousSong = this.currentSong;
-        this.progress = playback.progress_ms;
-        this.progressPercent = { upper: this.progress };
-        console.log(playback);
-        console.log("IS PLAYING", this.isPlaying);
-        if (this.isPlaying && this.interval == null) {
-          this.startTimer(this.currentSong.duration_ms, playback.progress_ms);
-        } else {
-          console.log("the else");
-          clearInterval(this.interval);
-          if (!this.isPlaying) {
-            this.paused = true;
+        } else if (playback != null) {
+          const params = {
+            sessionID: localStorage.getItem('sessionId'),
+            token: localStorage.getItem('access_token')
+          };
+          this._http.post(environment.apiUrl + 'Queue/NowPlaying/', {}, { params }).subscribe(data => {
+            console.log(data);
+          });
+          this.isPlaying = playback.is_playing;
+          this.currentSong = playback.item as SpotifyApi.TrackObjectFull;
+          this.previousSong = this.currentSong;
+          this.progress = playback.progress_ms;
+          this.progressPercent = { upper: this.progress };
+          console.log(playback);
+          console.log("IS PLAYING", this.isPlaying);
+          if (this.isPlaying && this.interval == null) {
+            this.startTimer(this.currentSong.duration_ms, playback.progress_ms);
+          } else {
+            console.log("the else");
+            clearInterval(this.interval);
+            if (!this.isPlaying) {
+              this.paused = true;
+            }
+            this.startTimer(this.currentSong.duration_ms, playback.progress_ms);
           }
-          this.startTimer(this.currentSong.duration_ms, playback.progress_ms);
         }
       });
     } else {
@@ -100,7 +104,7 @@ export class PlayerComponent implements OnInit {
         if (this.queue?.length > 0 && this.leader) {
           this.skipQueue.emit();
         } else {
-          //this.setCurrentSong();
+          this.setCurrentSong();
         }
         console.log("reset timer");
       }

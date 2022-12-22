@@ -8,5 +8,6 @@ namespace Server
         Task BroadcastUsers();
         Task BroadcastPlayback();
         Task BroadcastEnd();
+        Task BroadcastNowPlaying(object playing);
     }
 }
