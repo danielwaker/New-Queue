@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using SpotifyAPI.Web;
+using System.Threading.Tasks;
 
 namespace Server
 {
@@ -8,6 +9,7 @@ namespace Server
         Task BroadcastUsers();
         Task BroadcastPlayback();
         Task BroadcastEnd();
-        Task BroadcastNowPlaying(object playing);
+        Task BroadcastNowPlaying(FullTrack playing, int? progress, bool isPlaying);
+        Task BroadcastProgress(int progress);
     }
 }

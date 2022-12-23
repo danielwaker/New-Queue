@@ -167,12 +167,19 @@ namespace Server.Controllers
             return NoContent();
         }
 
+        [HttpPost("Progress")]
+        public async Task<IActionResult> Progress(string sessionID, int progress)
+        {
+            await _hubContext.Clients.Group(sessionID).BroadcastProgress(progress);
+            return NoContent();
+        }
+
         [HttpPost("NowPlaying")]
         public async Task<IActionResult> NowPlaying(string sessionID, string token)
         {
             var spotify = new SpotifyClient(token);
             var currentlyPlaying = await spotify.Player.GetCurrentlyPlaying(new PlayerCurrentlyPlayingRequest());
-            await _hubContext.Clients.Group(sessionID).BroadcastNowPlaying(currentlyPlaying);
+            await _hubContext.Clients.Group(sessionID).BroadcastNowPlaying((FullTrack)currentlyPlaying.Item, currentlyPlaying.ProgressMs, currentlyPlaying.IsPlaying);
             return NoContent();
         }
 
@@ -186,7 +193,8 @@ namespace Server.Controllers
             var response = await new OAuthClient().RequestToken(
                 new AuthorizationCodeTokenRequest("5794ad59a90744c9aba2ca18cd73bc10", "8a1204cb1f0042679933dcd724ab919f", code, uri));
             var spotify = new SpotifyClient(response.AccessToken);
-            var url = _iConfig.GetValue<string>("URL") + $"callback?access_token={response.AccessToken}&token_type={response.TokenType}&expires_in={response.ExpiresIn}";
+            var front = (_iConfig.GetValue<string>("URL").Contains("localhost")) ? _iConfig.GetValue<string>("URL") : state + "/";
+            var url = front + $"callback?access_token={response.AccessToken}&token_type={response.TokenType}&expires_in={response.ExpiresIn}";
             //trigger workflow
             return Redirect(url);
         }

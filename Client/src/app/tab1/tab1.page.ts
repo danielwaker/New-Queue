@@ -72,13 +72,20 @@ export class Tab1Page {
       this.player.outsideUserPlayPause();
     });
 
-    this.connection.on("BroadcastNowPlaying", (nowPlaying: SpotifyApi.CurrentlyPlayingObject) => {
+    this.connection.on("BroadcastNowPlaying", (nowPlaying: any, progress: number, isPlaying: boolean) => {
       console.log("Notification");
       console.log(nowPlaying);
       if (!this.leader) {
-        this.player.setCurrentSong(nowPlaying.item as SpotifyApi.TrackObjectFull);
+        nowPlaying.duration_ms = nowPlaying.durationMs;
+        nowPlaying = nowPlaying as SpotifyApi.TrackObjectFull;
+        this.player.setCurrentSong(nowPlaying, progress, isPlaying);
         this.getQueue();
       }
+    });
+
+    this.connection.on("BroadcastProgress", (progress: number) => {
+      console.log("Notification");
+      this.player.setProgress(progress);
     });
 
     this.connection.on("BroadcastEnd", () => {
@@ -155,6 +162,15 @@ export class Tab1Page {
         this.sessionStatus = (this.leader) ? SessionEnum.End : SessionEnum.Leave;
         if (getQueue) {
           this.getQueue();
+        }
+        if (this.leader) {
+          const params = {
+            sessionID: localStorage.getItem('sessionId'),
+            token: localStorage.getItem('access_token')
+          };
+          this._http.post(environment.apiUrl + 'Queue/NowPlaying/', {}, { params }).subscribe(data => {
+            console.log(data);
+          });
         }
       }
     });
@@ -235,6 +251,9 @@ export class Tab1Page {
   }
 
   startQueue(putPlay = false) {
+    if (!this.leader) {
+      return;
+    }
     const bearer = 'Bearer ' + localStorage.getItem("access_token");
     const headers = { "Accept": "application/json",
     "Content-Type": "application/json",

@@ -43,7 +43,7 @@ export class PlayerComponent implements OnInit {
     this.setCurrentSong();
   }
 
-  setCurrentSong(playing: SpotifyApi.TrackObjectFull = null) {
+  setCurrentSong(playing: SpotifyApi.TrackObjectFull = null, progress: number = 0, isPlaying: boolean = true) {
     if (playing == null) {
       const headers = this.headers();
       this._http.get<any>(this.playerURL, { headers }).subscribe((playback: SpotifyApi.CurrentlyPlayingObject) => {
@@ -79,11 +79,21 @@ export class PlayerComponent implements OnInit {
     } else {
       this.currentSong = playing;
       //TODO: why does paused and isplaying both exist lol
-      this.paused = false;
-      this.isPlaying = true;
+      this.paused = !isPlaying;
+      this.isPlaying = isPlaying;
       clearInterval(this.interval);
-      this.progress = 0;
-      this.startTimer(this.currentSong.duration_ms, 0);
+      this.progress = progress;
+      this.progressPercent = { upper: this.progress };
+      this.startTimer(this.currentSong.duration_ms, progress);
+      if (this.leader) {
+        const params = {
+          sessionID: localStorage.getItem('sessionId'),
+          token: localStorage.getItem('access_token')
+        };
+        this._http.post(environment.apiUrl + 'Queue/NowPlaying/', {}, { params }).subscribe(data => {
+          console.log(data);
+        });
+      }
     }
   }
 
@@ -103,7 +113,7 @@ export class PlayerComponent implements OnInit {
         this.progress = 0;
         if (this.queue?.length > 0 && this.leader) {
           this.skipQueue.emit();
-        } else {
+        } else if (this.leader) {
           this.setCurrentSong();
         }
         console.log("reset timer");
@@ -161,6 +171,13 @@ export class PlayerComponent implements OnInit {
           position_ms: newProgress
         }
         this._http.put<any>(this.playerURL + "seek", {}, { params, headers }).subscribe((bruh) => {
+          const params = {
+            sessionID: localStorage.getItem('sessionId'),
+            progress: newProgress
+          };
+          this._http.post(environment.apiUrl + 'Queue/Progress/', {}, { params }).subscribe(data => {
+            console.log(data);
+          });
           clearInterval(this.interval);
           this.progress = newProgress;
           this.progressPercent = { upper: this.progress }
@@ -172,6 +189,15 @@ export class PlayerComponent implements OnInit {
       }
     } else {
       this.startingProgress = event.detail.value as number;
+    }
+  }
+
+  setProgress(progress: number) {
+    if (!this.leader) {
+      clearInterval(this.interval);
+      this.progress = progress;
+      this.progressPercent = { upper: this.progress };
+      this.startTimer(this.currentSong.duration_ms, this.progress);
     }
   }
 

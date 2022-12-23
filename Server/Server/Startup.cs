@@ -23,7 +23,7 @@ namespace Server
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            origins = new string[]{ "https://localhost:44397", "http://localhost:5000", "http://localhost:8100", "https://party-queue-api.azurewebsites.net", "https://purple-plant-0c5d2491e.1.azurestaticapps.net" };
+            origins = new string[]{ "https://localhost:44397", "http://localhost:5000", "http://localhost:8100", "http://localhost:8101", "https://party-queue-api.azurewebsites.net", "https://purple-plant-0c5d2491e.1.azurestaticapps.net" };
         }
 
         public IConfiguration Configuration { get; }

@@ -57,7 +57,7 @@ export class LoginPage implements OnInit {
     .set(this.client_id, this.clientId)
     .set(this.response_type, this.responseTypeCode)
     .set(this.redirect_uri, this.redirectUriBack)
-    .set(this.state_, this.state)
+    .set(this.state_, location.origin)
     .set(this.scope_, this.scope);
     window.location.href = this.authorizeUrl + params.toString();
     
