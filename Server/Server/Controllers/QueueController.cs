@@ -193,7 +193,7 @@ namespace Server.Controllers
             var response = await new OAuthClient().RequestToken(
                 new AuthorizationCodeTokenRequest("5794ad59a90744c9aba2ca18cd73bc10", "8a1204cb1f0042679933dcd724ab919f", code, uri));
             var spotify = new SpotifyClient(response.AccessToken);
-            var front = (_iConfig.GetValue<string>("URL").Contains("localhost")) ? _iConfig.GetValue<string>("URL") : state + "/";
+            var front = _iConfig.GetValue<string>("URL").Contains("localhost") ? state + "/" : _iConfig.GetValue<string>("URL");
             var url = front + $"callback?access_token={response.AccessToken}&token_type={response.TokenType}&expires_in={response.ExpiresIn}";
             //trigger workflow
             return Redirect(url);
