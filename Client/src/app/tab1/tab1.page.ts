@@ -36,7 +36,9 @@ export class Tab1Page {
   ngOnInit() {
 
     if (localStorage.getItem('sessionId')) {
-      this.getUsers(true);
+      if (localStorage.getItem('leader') == 'true') {
+        this.getUsers(true);
+      }
       this.qrUrl = localStorage.getItem('qr');
     } else {
       this.leader = true;
@@ -110,8 +112,14 @@ export class Tab1Page {
       reconnect: reconnect
     };
     console.log(params);
-    this._http.post(environment.apiUrl + 'Queue/AddUser/', {}, { params }).subscribe(data => {
+    this._http.post(environment.apiUrl + 'Queue/AddUser/', {}, { params }).subscribe((data: any) => {
       console.log(data);
+      if (data.qr.length > 0) {
+        this.qrUrl = 'data:image/jpeg;base64,' + data.qr;
+        this.showQr = true;
+        this.showOrHide = ShowOrHide.Hide;
+        localStorage.setItem(LocalStorageEnum.Qr, this.qrUrl);
+      }
     });
   }
 
@@ -157,6 +165,8 @@ export class Tab1Page {
       if (data === null) {
         localStorage.removeItem("sessionId");
       } else {
+        console.log(this.users)
+        console.log(localStorage.getItem('user'))
         this.leader = this.users[localStorage.getItem('user')].leader;
         localStorage.setItem("leader", String(this.leader));
         this.sessionStatus = (this.leader) ? SessionEnum.End : SessionEnum.Leave;
@@ -235,13 +245,21 @@ export class Tab1Page {
     await toast.present();
   }
 
-  // TODO: Remove user from list of users when leaving
   leaveSession(end = false) {
     if (end) {
       const params = {
-        sessionID: localStorage.getItem('sessionId')
+        sessionID: localStorage.getItem(LocalStorageEnum.SessionId)
       };
       this._http.post(environment.apiUrl + 'Queue/EndSession/', {}, { params }).subscribe(data => {
+        console.log(data);
+      });
+    } else {
+      const params = {
+        sessionID: localStorage.getItem(LocalStorageEnum.SessionId),
+        user: localStorage.getItem(LocalStorageEnum.User),
+        connectionId: this.connection.connectionId
+      };
+      this._http.post(environment.apiUrl + 'Queue/LeaveSession/', {}, { params }).subscribe(data => {
         console.log(data);
       });
     }

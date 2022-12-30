@@ -43,7 +43,7 @@ namespace Server.Controllers
             //string url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}?sessionID={sessionID}";
             string url = _iConfig.GetValue<string>("URL") + $"login?sessionID={sessionID}";
             string sessionQR = SessionQR(url);
-            CreateSessionData(sessionID, user);
+            CreateSessionData(sessionID, sessionQR, user);
             _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
             return new
             {
@@ -57,6 +57,22 @@ namespace Server.Controllers
         {
             _sessionService.Remove(sessionID);
             await _hubContext.Clients.Group(sessionID).BroadcastEnd();
+            return NoContent();
+        }
+
+        [HttpPost("LeaveSession")]
+        public async Task<IActionResult> LeaveSession(string sessionID, string user, string connectionId)
+        {
+            Session session = _sessionService.Get(sessionID);
+            
+            //if leader ends session
+            if (session != null)
+            {
+                session.RemoveUser(user);
+                _sessionService.Update(sessionID, session);
+                await _hubContext.Groups.RemoveFromGroupAsync(connectionId, sessionID);
+                await _hubContext.Clients.Group(sessionID).BroadcastUsers();
+            }
             return NoContent();
         }
 
@@ -84,9 +100,9 @@ namespace Server.Controllers
             }
         }
 
-        private void CreateSessionData(string sessionID, string user)
+        private void CreateSessionData(string sessionID, string qr, string user)
         {
-            _sessionService.Create(sessionID, user);
+            _sessionService.Create(sessionID, qr, user);
         }
 
         [HttpPost("AddSong")]
@@ -101,17 +117,19 @@ namespace Server.Controllers
         }
 
         [HttpPost("AddUser")]
-        public async Task<IActionResult> AddUser(string sessionID, string user, string connectionID, bool reconnect = false)
+        public async Task<object> AddUser(string sessionID, string user, string connectionID, bool reconnect = false)
         {
+            string qr = string.Empty;
             if (!reconnect)
             {
                 Session session = _sessionService.Get(sessionID);
                 session.AddUser(user);
                 _sessionService.Update(sessionID, session);
+                qr = session.GetQr();
             }
             await _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
             await _hubContext.Clients.Group(sessionID).BroadcastUsers();
-            return NoContent();
+            return new { qr = qr };
         }
 
         [HttpGet("GetQueue")]
@@ -128,7 +146,6 @@ namespace Server.Controllers
         {
             Session session = _sessionService.Get(sessionID);
             OrderedDictionary users = session.GetUsers();
-            _sessionService.Update(sessionID, session);
             return users;
         }
 

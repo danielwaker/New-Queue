@@ -45,14 +45,15 @@ export class LoginPage implements OnInit {
     // this.http.get<any>(this.authorizeUrl, {params}).subscribe(data => {
     //   console.log(data);
     // });
-
-    if (this.route.snapshot.queryParams.sessionID) {
-      localStorage.setItem(LocalStorageEnum.SessionId, this.route.snapshot.queryParams.sessionID);
-    }
+    
     console.log(localStorage.getItem('access_token'));
   }
 
   Login() {
+    localStorage.clear();
+    if (this.route.snapshot.queryParams.sessionID) {
+      localStorage.setItem(LocalStorageEnum.SessionId, this.route.snapshot.queryParams.sessionID);
+    }
     let params = new HttpParams()
     .set(this.client_id, this.clientId)
     .set(this.response_type, this.responseTypeCode)

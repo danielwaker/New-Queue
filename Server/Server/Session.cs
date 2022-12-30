@@ -31,16 +31,18 @@ namespace Server
         public string Id { get; set; }
 
         public string sessionID { get; set; }
+        public string qr { get; set; }
         public OrderedDictionary users { get; set; }
         public List<Song> songs { get; set; }
 
         public Session() { }
 
-        public Session(string sessionID, string user)
+        public Session(string sessionID, string qr, string user)
         {
             users = new OrderedDictionary();
             songs = new List<Song>();
             this.sessionID = sessionID;
+            this.qr = qr;
             AddUser(user, true);
         }
 
@@ -65,6 +67,7 @@ namespace Server
         public void RemoveUser(string user)
         {
             users.Remove(user);
+            songs.RemoveAll(song => song.User == user);
         }
 
         public void AddSong(string user, string song)
@@ -97,6 +100,17 @@ namespace Server
 
         public void RemoveSong(int songIndex)
         {
+/*            foreach (Song song in songs)
+            {
+                if (song.Uri == null)
+                {
+                    songIndex++;
+                }
+                else
+                {
+                    break;
+                }
+            }*/
             songs.RemoveAt(songIndex);
             songs.Capacity = songs.Capacity - 1;
         }
@@ -106,6 +120,11 @@ namespace Server
             Song song = songs[songIndex];
             songs.RemoveAt(songIndex);
             songs.Insert(newIndex, song);
+        }
+
+        public string GetQr()
+        {
+            return qr;
         }
 
         public List<Song> GetSongs()
