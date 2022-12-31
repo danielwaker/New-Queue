@@ -17,5 +17,7 @@ export enum ShowOrHide {
 export enum LocalStorageEnum {
     SessionId = 'sessionId',
     User = 'user',
-    Qr = 'qr'
+    Qr = 'qr',
+    Token = 'access_token',
+    Leader = 'leader'
 }

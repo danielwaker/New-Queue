@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { AlertController, IonInput, LoadingController, ToastController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { LocalStorageEnum } from '../enums';
 //import * as joe from "spotify-api";
 
 @Component({
@@ -90,7 +91,7 @@ export class Tab2Page {
   //this is just testing
   testgetsong(track: SpotifyApi.TrackObjectFull) {
     const params = {
-      token: localStorage.getItem('access_token'),
+      token: localStorage.getItem(LocalStorageEnum.Token),
       song: track.id
     };
     console.log(params);
@@ -112,8 +113,8 @@ export class Tab2Page {
     const headers = this.headers();
     
     const params = {
-      sessionID: localStorage.getItem('sessionId'),
-      user: localStorage.getItem('user'),
+      sessionID: localStorage.getItem(LocalStorageEnum.SessionId),
+      user: localStorage.getItem(LocalStorageEnum.User),
       uri: track.id,
       // name: track.name,
       // artist: track.artists[0].name,
@@ -177,7 +178,7 @@ export class Tab2Page {
   }
 
   headers(): any {
-    const bearer = 'Bearer ' + localStorage.getItem("access_token");
+    const bearer = 'Bearer ' + localStorage.getItem(LocalStorageEnum.Token);
     const headers = { "Accept": "application/json",
     "Content-Type": "application/json",
     "Authorization": bearer};

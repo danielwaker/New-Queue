@@ -30,16 +30,16 @@ export class Tab1Page {
   constructor(private _http: HttpClient, private alertController: AlertController, private toastController: ToastController, private clipboard: Clipboard) { }
 
   ionViewWillEnter() {
-    this.leader = localStorage.getItem('leader') != 'false';
+    this.leader = localStorage.getItem(LocalStorageEnum.Leader) != 'false';
   }
 
   ngOnInit() {
 
-    if (localStorage.getItem('sessionId')) {
-      if (localStorage.getItem('leader') == 'true') {
+    if (localStorage.getItem(LocalStorageEnum.SessionId)) {
+      if (localStorage.getItem(LocalStorageEnum.Leader) == 'true') {
         this.getUsers(true);
       }
-      this.qrUrl = localStorage.getItem('qr');
+      this.qrUrl = localStorage.getItem(LocalStorageEnum.Qr);
     } else {
       this.leader = true;
     }
@@ -50,7 +50,7 @@ export class Tab1Page {
   
     this.connection.start().then(() => {  
       console.log('SignalR Connected!');
-      if (localStorage.getItem('sessionId')) {
+      if (localStorage.getItem(LocalStorageEnum.SessionId)) {
         this.addUser();
       }
     }).catch(function (err) {  
@@ -98,7 +98,7 @@ export class Tab1Page {
 
   async addUser() {
     let reconnect = false;
-    if (localStorage.getItem('user')) {
+    if (localStorage.getItem(LocalStorageEnum.User)) {
       reconnect = true;
     } else {
       let user = await this.spotifyUser();
@@ -106,8 +106,8 @@ export class Tab1Page {
     }
 
     const params = {
-      sessionID: localStorage.getItem('sessionId'),
-      user: localStorage.getItem('user'),
+      sessionID: localStorage.getItem(LocalStorageEnum.SessionId),
+      user: localStorage.getItem(LocalStorageEnum.User),
       connectionID: this.connection.connectionId,
       reconnect: reconnect
     };
@@ -124,21 +124,14 @@ export class Tab1Page {
   }
 
   async spotifyUser() {
-    const bearer = 'Bearer ' + localStorage.getItem("access_token");
-    const headers = { "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": bearer};
-    
+    const headers = this.headers();    
     return await this._http.get<SpotifyApi.UserProfileResponse>('https://api.spotify.com/v1/me', {headers}).toPromise();
   }
 
   getQueue() {
-    const bearer = 'Bearer ' + localStorage.getItem("access_token");
-    const headers = { "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": bearer};
+    const headers = this.headers();
     const params = {
-      sessionID: localStorage.getItem('sessionId')
+      sessionID: localStorage.getItem(LocalStorageEnum.SessionId)
     };
     console.log(params);
     this._http.get(environment.apiUrl + 'Queue/GetQueue/', { params }).subscribe((data: Song[]) => {
@@ -157,7 +150,7 @@ export class Tab1Page {
 
   getUsers(getQueue: boolean = false) {
     const params = {
-      sessionID: localStorage.getItem('sessionId')
+      sessionID: localStorage.getItem(LocalStorageEnum.SessionId)
     };
     console.log(params);
     this._http.get(environment.apiUrl + 'Queue/GetUsers/', { params }).subscribe((data: Record<string,User>) => {
@@ -166,17 +159,17 @@ export class Tab1Page {
         localStorage.removeItem("sessionId");
       } else {
         console.log(this.users)
-        console.log(localStorage.getItem('user'))
-        this.leader = this.users[localStorage.getItem('user')].leader;
-        localStorage.setItem("leader", String(this.leader));
+        console.log(localStorage.getItem(LocalStorageEnum.User))
+        this.leader = this.users[localStorage.getItem(LocalStorageEnum.User)].leader;
+        localStorage.setItem(LocalStorageEnum.Leader, String(this.leader));
         this.sessionStatus = (this.leader) ? SessionEnum.End : SessionEnum.Leave;
         if (getQueue) {
           this.getQueue();
         }
         if (this.leader) {
           const params = {
-            sessionID: localStorage.getItem('sessionId'),
-            token: localStorage.getItem('access_token')
+            sessionID: localStorage.getItem(LocalStorageEnum.SessionId),
+            token: localStorage.getItem(LocalStorageEnum.Token)
           };
           this._http.post(environment.apiUrl + 'Queue/NowPlaying/', {}, { params }).subscribe(data => {
             console.log(data);
@@ -198,15 +191,11 @@ export class Tab1Page {
 
   async createSession() {
     await this.createQueueAlert();
-    const bearer = 'Bearer ' + localStorage.getItem("access_token");
-    const headers = { "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": bearer};
     
     let user = await this.spotifyUser();
     localStorage.setItem(LocalStorageEnum.User, user.display_name);
     const params = {
-      user: localStorage.getItem('user'),
+      user: localStorage.getItem(LocalStorageEnum.User),
       connectionID: this.connection.connectionId
     };
     this._http.get(environment.apiUrl + 'Queue/CreateSession/',  { params }).subscribe((data: CreateSession) => {
@@ -272,10 +261,7 @@ export class Tab1Page {
     if (!this.leader) {
       return;
     }
-    const bearer = 'Bearer ' + localStorage.getItem("access_token");
-    const headers = { "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": bearer};
+    const headers = this.headers();
     if (this.queue[0] != null) {
       const params = {
         uri: this.queue[0][0].uri
@@ -295,10 +281,7 @@ export class Tab1Page {
   }
 
   startQueueUtility(putPlay = false) {
-    const bearer = 'Bearer ' + localStorage.getItem("access_token");
-    const headers = { "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": bearer};
+    const headers = this.headers();
     const body = {
       uris: [this.queue[0][0].uri]
     };
@@ -325,7 +308,7 @@ export class Tab1Page {
 
   removeSong(index: number) {
     const params = {
-      sessionID: localStorage.getItem('sessionId'),
+      sessionID: localStorage.getItem(LocalStorageEnum.SessionId),
       songIndex: index
     };
     this._http.post(environment.apiUrl + 'Queue/RemoveSong/', {}, { params }).subscribe((data) => {
@@ -336,7 +319,7 @@ export class Tab1Page {
 
   handleReorder(ev: CustomEvent<ItemReorderEventDetail>) {
     const params = {
-      sessionID: localStorage.getItem('sessionId'),
+      sessionID: localStorage.getItem(LocalStorageEnum.SessionId),
       songIndex: ev.detail.from,
       newIndex: ev.detail.to
     };
@@ -365,6 +348,15 @@ export class Tab1Page {
 
   refresh() {
     this.player.refresh();
+  }
+
+  headers(): any {
+    const bearer = 'Bearer ' + localStorage.getItem(LocalStorageEnum.Token);
+    const headers = { "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": bearer};
+
+    return headers;
   }
 
   async log(message: string) {

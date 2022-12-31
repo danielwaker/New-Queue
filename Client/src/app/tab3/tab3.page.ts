@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
+import { LocalStorageEnum } from '../enums';
 
 @Component({
   selector: 'app-tab3',
@@ -23,7 +24,7 @@ export class Tab3Page {
   constructor(private http: HttpClient, private router: Router) {}
 
   devices() {
-    const bearer = 'Bearer ' + localStorage.getItem("access_token");
+    const bearer = 'Bearer ' + localStorage.getItem(LocalStorageEnum.Token);
     const headers = { 
       "Accept": "application/json",
       "Content-Type": "application/json",
@@ -63,6 +64,6 @@ export class Tab3Page {
   }
 
   removeLeader() {
-    localStorage.setItem("leader", "false");
+    localStorage.setItem(LocalStorageEnum.Leader, "false");
   }
 }

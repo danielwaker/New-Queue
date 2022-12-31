@@ -45,8 +45,8 @@ export class LoginPage implements OnInit {
     // this.http.get<any>(this.authorizeUrl, {params}).subscribe(data => {
     //   console.log(data);
     // });
-    
-    console.log(localStorage.getItem('access_token'));
+
+    console.log(localStorage.getItem(LocalStorageEnum.Token));
   }
 
   Login() {

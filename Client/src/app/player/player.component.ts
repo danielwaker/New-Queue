@@ -3,7 +3,7 @@ import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { PlayPause } from '../enums';
+import { LocalStorageEnum, PlayPause } from '../enums';
 
 @Component({
   selector: 'app-player',
@@ -51,8 +51,8 @@ export class PlayerComponent implements OnInit {
           this.setCurrentSong();
         } else if (playback != null) {
           const params = {
-            sessionID: localStorage.getItem('sessionId'),
-            token: localStorage.getItem('access_token')
+            sessionID: localStorage.getItem(LocalStorageEnum.SessionId),
+            token: localStorage.getItem(LocalStorageEnum.Token)
           };
           this._http.post(environment.apiUrl + 'Queue/NowPlaying/', {}, { params }).subscribe(data => {
             console.log(data);
@@ -87,8 +87,8 @@ export class PlayerComponent implements OnInit {
       this.startTimer(this.currentSong.duration_ms, progress);
       if (this.leader) {
         const params = {
-          sessionID: localStorage.getItem('sessionId'),
-          token: localStorage.getItem('access_token')
+          sessionID: localStorage.getItem(LocalStorageEnum.SessionId),
+          token: localStorage.getItem(LocalStorageEnum.Token)
         };
         this._http.post(environment.apiUrl + 'Queue/NowPlaying/', {}, { params }).subscribe(data => {
           console.log(data);
@@ -129,7 +129,7 @@ export class PlayerComponent implements OnInit {
     this.isUserFlippingPlayback = true;
     this._http.put<any>(this.playerURL + playPause, {}, { headers }).subscribe(() => {
       const params = {
-        sessionID: localStorage.getItem('sessionId')
+        sessionID: localStorage.getItem(LocalStorageEnum.SessionId)
       };
       this._http.post(environment.apiUrl + 'Queue/Playback/', {}, { params }).subscribe(data => {
         console.log(data);
@@ -172,7 +172,7 @@ export class PlayerComponent implements OnInit {
         }
         this._http.put<any>(this.playerURL + "seek", {}, { params, headers }).subscribe((bruh) => {
           const params = {
-            sessionID: localStorage.getItem('sessionId'),
+            sessionID: localStorage.getItem(LocalStorageEnum.SessionId),
             progress: newProgress
           };
           this._http.post(environment.apiUrl + 'Queue/Progress/', {}, { params }).subscribe(data => {
@@ -210,7 +210,7 @@ export class PlayerComponent implements OnInit {
   }
 
   headers(): any {
-    const bearer = 'Bearer ' + localStorage.getItem("access_token");
+    const bearer = 'Bearer ' + localStorage.getItem(LocalStorageEnum.Token);
     const headers = { "Accept": "application/json",
     "Content-Type": "application/json",
     "Authorization": bearer};
