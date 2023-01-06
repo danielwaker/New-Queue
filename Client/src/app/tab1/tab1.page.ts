@@ -134,17 +134,23 @@ export class Tab1Page {
       sessionID: localStorage.getItem(LocalStorageEnum.SessionId)
     };
     console.log(params);
-    this._http.get(environment.apiUrl + 'Queue/GetQueue/', { params }).subscribe((data: Song[]) => {
-      this.queue = [];
-      data.forEach(song => {
+    this._http.get(environment.apiUrl + 'Queue/GetQueue/', { params }).subscribe((songs: Song[]) => {
+      let tempQueue: [SpotifyApi.TrackObjectFull, string][] = [];
+      songs.forEach((song: Song) => {
         if (song.uri != null) {
           this._http.get('https://api.spotify.com/v1/tracks/' + song.uri, { headers }).subscribe((data: SpotifyApi.TrackObjectFull) => {
-            this.queue.push([data, song.user]);
+            const index = songs.findIndex(item => item.uri == song.uri);
+            let user = songs[index].user;
+            tempQueue.splice(index, 0, [data, user]);
           });
         }
-      });
-      console.log(data);
-      console.log(this.queue);
+      }
+      );
+      if (tempQueue != this.queue) {
+        this.queue = tempQueue;
+      }
+      console.log(tempQueue);
+      console.log(songs);
     });
   }
 
