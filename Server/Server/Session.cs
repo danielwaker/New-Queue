@@ -72,7 +72,11 @@ namespace Server
 
         public void AddSong(string user, string song)
         {
-            var newSong = songs.FindLast((Song song) => song.Uri == null && song.User == user);
+            // find last instance of free space for user song
+            var newSongIndex = songs.FindLastIndex((Song song) => song.Uri == null && song.User == user);
+            var newSong = songs[newSongIndex];
+
+            // user index because apparently ordered dicts have no indexing
             int userIndex = 0;
             foreach (string u in users.Keys)
             {
@@ -82,36 +86,72 @@ namespace Server
                 }
                 userIndex++;
             }
+
+            // sets previous free space to the new song URI
             newSong.Uri = song;
+
+            // so this is the process for where the new free space gets added
             Song userSong = new Song()
             {
                 User = user,
                 Uri = null
             };
             User userInfo = users[user] as User;
-            int songCount = userInfo.Songs;
-            int songIndex = (songCount + 1) * users.Count + userIndex;
+            int userSongCount = userInfo.Songs;
+
+            // TODO: what is happening here lol
+            int songIndex = (userSongCount + 1) * users.Count + userIndex;
             if (songIndex > songs.Count)
                 songIndex = songs.Count;
             songs.Insert(songIndex, userSong);
-            userInfo.Songs = songCount + 1;
+            userInfo.Songs = userSongCount + 1;
             users[user] = userInfo;
+
+            return;
+            // proposed alternative?
         }
+
 
         public void RemoveSong(int songIndex)
         {
-/*            foreach (Song song in songs)
+            // so the index of the visual queue may not match the virtual queue
+            // because of free spaces
+            // so here we are setting the visual song index to be the virtual index
+            int i = 0;
+            foreach (Song song in songs)
             {
-                if (song.Uri == null)
-                {
-                    songIndex++;
-                }
-                else
+                // if we have reached the song index, stop
+                if (i == songIndex)
                 {
                     break;
                 }
-            }*/
+                // if the index has a free space, increment song index
+                else if (song.Uri == null)
+                {
+                    songIndex++;
+                }
+                i++;
+            }
+
+            // decrement the number of songs the user who queued the song has
+            // if the user has no more songs queued, put in a new free space
+            var userKey = songs[songIndex].User;
+            var user = users[userKey] as User;
+            user.Songs = user.Songs - 1;
+            users[userKey] = user;
+            if (user.Songs == 0)
+            {
+                Song userSong = new Song()
+                {
+                    User = userKey,
+                    Uri = null
+                };
+                songs.Insert(users.Count - 1, userSong);
+            }
+
             songs.RemoveAt(songIndex);
+
+            // TODO: I don't really know why this is here ?
             songs.Capacity = songs.Capacity - 1;
         }
 
