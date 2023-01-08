@@ -207,8 +207,10 @@ namespace Server.Controllers
             var preUri = string.Concat(baseUrl, "/Queue/Callback");
             var uri = new Uri(preUri);
 
+            var clientId = _iConfig.GetValue<string>("Spotify:ClientId");
+            var clientSecret = _iConfig.GetValue<string>("Spotify:ClientSecret");
             var response = await new OAuthClient().RequestToken(
-                new AuthorizationCodeTokenRequest("5794ad59a90744c9aba2ca18cd73bc10", "8a1204cb1f0042679933dcd724ab919f", code, uri));
+                new AuthorizationCodeTokenRequest(clientId, clientSecret, code, uri));
             var spotify = new SpotifyClient(response.AccessToken);
             var front = _iConfig.GetValue<string>("URL").Contains("localhost") ? state + "/" : _iConfig.GetValue<string>("URL");
             var url = front + $"callback?access_token={response.AccessToken}&token_type={response.TokenType}&expires_in={response.ExpiresIn}";

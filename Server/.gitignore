@@ -454,4 +454,4 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 # Server/appsettings.json
-# Server/Sessions
+Server/appsettings.Development.json
