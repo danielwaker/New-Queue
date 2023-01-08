@@ -22,7 +22,7 @@
     "@awesome-cordova-plugins/background-mode": "^6.2.0",
     "@awesome-cordova-plugins/clipboard": "^6.2.0",
     "@awesome-cordova-plugins/core": "6.2.0",
-    "@capacitor/android": "^4.6.1",
+    "@capacitor/android": "4.0.1",
     "@capacitor/app": "4.0.1",
     "@capacitor/core": "4.0.1",
     "@capacitor/device": "4.1.0",
