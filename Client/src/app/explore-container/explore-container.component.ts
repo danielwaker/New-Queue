@@ -10,7 +10,6 @@ import { AuthenicateService } from '../authenicate.service';
 })
 export class ExploreContainerComponent implements OnInit {
   @Input() name: string;
-  public clientId = '5794ad59a90744c9aba2ca18cd73bc10';
   public responseType = 'token';
   public redirectUri = 'http://localhost:8100/callback';
   public state = 'secret';
