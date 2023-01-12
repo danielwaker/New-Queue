@@ -12,7 +12,7 @@ import { LocalStorageEnum } from '../enums';
 })
 export class LoginPage implements OnInit {
 
-  public clientId = '5794ad59a90744c9aba2ca18cd73bc10';
+  public clientId = environment.clientId;
   public responseTypeToken = 'token';
   public responseTypeCode = 'code';
   public redirectUriFront = 'http://localhost:8100/callback';

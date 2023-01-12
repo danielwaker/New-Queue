@@ -27,6 +27,20 @@ steps:
   displayName: 'npm install and build'
   workingDirectory: Client
 
+  - task: replacetokens@5
+  inputs:
+    targetFiles: 'Client/dist/**/main*.js'
+    encoding: 'auto'
+    tokenPattern: 'default'
+    writeBOM: true
+    actionOnMissing: 'fail'
+    keepToken: false
+    actionOnNoFiles: 'fail'
+    enableTransforms: false
+    enableRecursion: false
+    useLegacyPattern: false
+    enableTelemetry: true
+
 - task: CopyPublishBuildArtifacts@1
   displayName: 'Copy Publish Artifact: angular-web-app'
   inputs:

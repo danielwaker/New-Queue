@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://party-queue-api.azurewebsites.net/'
+  apiUrl: 'https://party-queue-api.azurewebsites.net/',
+  clientId: '#{clientId}#'
 };
