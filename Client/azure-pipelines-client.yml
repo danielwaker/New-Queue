@@ -27,7 +27,7 @@ steps:
   displayName: 'npm install and build'
   workingDirectory: Client
 
-  - task: replacetokens@5
+- task: replacetokens@5
   inputs:
     targetFiles: 'Client/dist/**/main*.js'
     encoding: 'auto'
