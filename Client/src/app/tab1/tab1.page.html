@@ -17,11 +17,17 @@
   <app-explore-container class="container" name="Front Page"></app-explore-container>
   <div class="buttons">
     <ion-button class="button-width" (click)="session()">{{sessionStatus}} Session</ion-button>
-    <ion-button class="button-width" *ngIf="sessionStatus !== 'Create'" (click)="toggleQr()">{{showOrHide}} QR Code</ion-button>    
+    <ion-button class="button-width" *ngIf="sessionStatus !== 'Create'" (click)="toggleQr()">{{showOrHide}} QR Code</ion-button>
+    <ion-button class="button-width" (click)="toggleUsers()">Users ({{userCount}})</ion-button>
   </div>
   <div class="qr-container" *ngIf="showQr">
     <img class="qr" [src]="qrUrl"/>
   </div>
+  <ion-list class="users" *ngIf="showUsers">
+    <div *ngFor="let user of userArray; index as i">
+      <ion-item>{{user}}</ion-item>
+    </div>
+  </ion-list>
   <div *ngIf="queue && queue.length > 0">
     <ion-list>
       <ion-reorder-group [disabled]="!leader" (ionItemReorder)="handleReorder($any($event))">

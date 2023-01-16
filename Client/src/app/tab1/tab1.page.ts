@@ -26,6 +26,9 @@ export class Tab1Page {
   public sessionStatus = SessionEnum.Create;
   public showQr = false;
   public showOrHide = ShowOrHide.Show;
+  public showUsers = false;
+  public userArray: string[] = null;
+  public userCount = 0;
 
   constructor(private _http: HttpClient, private alertController: AlertController, private toastController: ToastController, private clipboard: Clipboard) { }
 
@@ -161,6 +164,8 @@ export class Tab1Page {
     console.log(params);
     this._http.get(environment.apiUrl + 'Queue/GetUsers/', { params }).subscribe((data: Record<string,User>) => {
       this.users = data;
+      this.userArray = Object.keys(this.users);
+      this.userCount = this.userArray.length;
       if (data === null) {
         localStorage.removeItem("sessionId");
       } else {
@@ -350,6 +355,10 @@ export class Tab1Page {
       this.showQr = !this.showQr;
       this.showOrHide = (this.showQr) ? ShowOrHide.Hide : ShowOrHide.Show;
     }
+  }
+
+  toggleUsers() {
+    this.showUsers = !this.showUsers;
   }
 
   refresh() {
