@@ -18,7 +18,7 @@
   <div class="buttons">
     <ion-button class="button-width" (click)="session()">{{sessionStatus}} Session</ion-button>
     <ion-button class="button-width" *ngIf="sessionStatus !== 'Create'" (click)="toggleQr()">{{showOrHide}} QR Code</ion-button>
-    <ion-button class="button-width" (click)="toggleUsers()">Users ({{userCount}})</ion-button>
+    <ion-button class="button-width" *ngIf="sessionStatus !== 'Create'" (click)="toggleUsers()">Users ({{userCount}})</ion-button>
   </div>
   <div class="qr-container" *ngIf="showQr">
     <img class="qr" [src]="qrUrl"/>
