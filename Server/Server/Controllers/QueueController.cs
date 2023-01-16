@@ -136,6 +136,7 @@ namespace Server.Controllers
             catch (Exception e)
             {
                 _logger.LogError("AddUser Error", e);
+                return NoContent();
             }
         }
 
