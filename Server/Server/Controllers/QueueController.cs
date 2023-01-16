@@ -119,17 +119,24 @@ namespace Server.Controllers
         [HttpPost("AddUser")]
         public async Task<object> AddUser(string sessionID, string user, string connectionID, bool reconnect = false)
         {
-            string qr = string.Empty;
-            if (!reconnect)
+            try
             {
-                Session session = _sessionService.Get(sessionID);
-                session.AddUser(user);
-                _sessionService.Update(sessionID, session);
-                qr = session.GetQr();
+                string qr = string.Empty;
+                if (!reconnect)
+                {
+                    Session session = _sessionService.Get(sessionID);
+                    session.AddUser(user);
+                    _sessionService.Update(sessionID, session);
+                    qr = session.GetQr();
+                }
+                await _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
+                await _hubContext.Clients.Group(sessionID).BroadcastUsers();
+                return new { qr = qr };
             }
-            await _hubContext.Groups.AddToGroupAsync(connectionID, sessionID);
-            await _hubContext.Clients.Group(sessionID).BroadcastUsers();
-            return new { qr = qr };
+            catch (Exception e)
+            {
+                _logger.LogError("AddUser Error", e);
+            }
         }
 
         [HttpGet("GetQueue")]
