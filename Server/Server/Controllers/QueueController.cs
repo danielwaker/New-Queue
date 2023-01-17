@@ -233,7 +233,6 @@ namespace Server.Controllers
                 return NoContent();
             }
         }
-        }
 
         private Session DeserializeSession(string sessionID)
         {
