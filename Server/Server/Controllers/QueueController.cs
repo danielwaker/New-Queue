@@ -211,19 +211,28 @@ namespace Server.Controllers
         [HttpGet("Callback")]
         public async Task<IActionResult> Callback(string code, string state)
         {
-            string baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
-            var preUri = string.Concat(baseUrl, "/Queue/Callback");
-            var uri = new Uri(preUri);
+            try
+            {
+                string baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+                var preUri = string.Concat(baseUrl, "/Queue/Callback");
+                var uri = new Uri(preUri);
 
-            var clientId = _iConfig.GetValue<string>("Spotify:ClientId");
-            var clientSecret = _iConfig.GetValue<string>("Spotify:ClientSecret");
-            var response = await new OAuthClient().RequestToken(
-                new AuthorizationCodeTokenRequest(clientId, clientSecret, code, uri));
-            var spotify = new SpotifyClient(response.AccessToken);
-            var front = _iConfig.GetValue<string>("URL").Contains("localhost") ? state + "/" : _iConfig.GetValue<string>("URL");
-            var url = front + $"callback?access_token={response.AccessToken}&token_type={response.TokenType}&expires_in={response.ExpiresIn}";
-            //trigger workflow
-            return Redirect(url);
+                var clientId = _iConfig.GetValue<string>("Spotify:ClientId");
+                var clientSecret = _iConfig.GetValue<string>("Spotify:ClientSecret");
+                var response = await new OAuthClient().RequestToken(
+                    new AuthorizationCodeTokenRequest(clientId, clientSecret, code, uri));
+                var spotify = new SpotifyClient(response.AccessToken);
+                var front = _iConfig.GetValue<string>("URL").Contains("localhost") ? state + "/" : _iConfig.GetValue<string>("URL");
+                var url = front + $"callback?access_token={response.AccessToken}&token_type={response.TokenType}&expires_in={response.ExpiresIn}";
+                //trigger workflow
+                return Redirect(url);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Callback Error", e);
+                return NoContent();
+            }
+        }
         }
 
         private Session DeserializeSession(string sessionID)
