@@ -202,10 +202,18 @@ namespace Server.Controllers
         [HttpPost("NowPlaying")]
         public async Task<IActionResult> NowPlaying(string sessionID, string token)
         {
-            var spotify = new SpotifyClient(token);
-            var currentlyPlaying = await spotify.Player.GetCurrentlyPlaying(new PlayerCurrentlyPlayingRequest());
-            await _hubContext.Clients.Group(sessionID).BroadcastNowPlaying((FullTrack)currentlyPlaying.Item, currentlyPlaying.ProgressMs, currentlyPlaying.IsPlaying);
-            return NoContent();
+            try
+            {
+                var spotify = new SpotifyClient(token);
+                var currentlyPlaying = await spotify.Player.GetCurrentlyPlaying(new PlayerCurrentlyPlayingRequest());
+                await _hubContext.Clients.Group(sessionID).BroadcastNowPlaying((FullTrack)currentlyPlaying.Item, currentlyPlaying.ProgressMs, currentlyPlaying.IsPlaying);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("NowPlaying Error", e);
+                return NoContent();
+            }
         }
 
         [HttpGet("Callback")]
