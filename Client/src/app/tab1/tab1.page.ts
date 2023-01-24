@@ -51,8 +51,9 @@ export class Tab1Page {
       .withUrl(environment.apiUrl + 'notify')  
       .build();
   
-    this.connection.start().then(() => {  
+    this.connection.start().then(() => {
       console.log('SignalR Connected!');
+      this.player.refresh();
       if (localStorage.getItem(LocalStorageEnum.SessionId)) {
         this.addUser();
       }

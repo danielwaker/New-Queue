@@ -29,7 +29,7 @@ export class PlayerComponent implements OnInit {
   constructor(private _http: HttpClient) { }
 
   ngOnInit() {
-    this.setCurrentSong();
+    //this.setCurrentSong();
     document.addEventListener("visibilitychange", async () => {
       if (!document.hidden) {
         this.refresh();
@@ -44,6 +44,7 @@ export class PlayerComponent implements OnInit {
   }
 
   setCurrentSong(playing: SpotifyApi.TrackObjectFull = null, progress: number = 0, isPlaying: boolean = true) {
+    console.log("setCurrentSong");
     if (playing == null) {
       const headers = this.headers();
       this._http.get<any>(this.playerURL, { headers }).subscribe((playback: SpotifyApi.CurrentlyPlayingObject) => {
