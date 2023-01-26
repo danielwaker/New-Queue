@@ -102,7 +102,8 @@ namespace Server.Controllers
 
         private void CreateSessionData(string sessionID, string qr, string user)
         {
-            _sessionService.Create(sessionID, qr, user);
+            var createdAt = DateTime.UtcNow;
+            _sessionService.Create(sessionID, qr, user, createdAt);
         }
 
         [HttpPost("AddSong")]

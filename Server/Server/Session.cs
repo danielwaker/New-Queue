@@ -32,17 +32,19 @@ namespace Server
 
         public string sessionID { get; set; }
         public string qr { get; set; }
+        public DateTime createdAt { get; set; }
         public OrderedDictionary users { get; set; }
         public List<Song> songs { get; set; }
 
         public Session() { }
 
-        public Session(string sessionID, string qr, string user)
+        public Session(string sessionID, string qr, string user, DateTime createdAt)
         {
             users = new OrderedDictionary();
             songs = new List<Song>();
             this.sessionID = sessionID;
             this.qr = qr;
+            this.createdAt = createdAt;
             AddUser(user, true);
         }
 

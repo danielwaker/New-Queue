@@ -23,9 +23,9 @@ namespace Server
         public Session Get(string sessionId) =>
             _session.Find(session => session.sessionID == sessionId).FirstOrDefault();
 
-        public Session Create(string sessionId, string qr, string user)
+        public Session Create(string sessionId, string qr, string user, DateTime createdAt)
         {
-            Session session = new Session(sessionId, qr, user);
+            Session session = new Session(sessionId, qr, user, createdAt);
             _session.InsertOne(session);
             return session;
         }
