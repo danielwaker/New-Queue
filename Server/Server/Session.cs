@@ -151,7 +151,23 @@ namespace Server
                 songs.Insert(users.Count - 1, userSong);
             }
 
-            songs.RemoveAt(songIndex);
+            // if song being removec is the last song queued, turn it into the free space instead
+            var allUserSongs = songs.FindAll((Song song) => song.User == userKey);
+            if (songs[songIndex] == allUserSongs[allUserSongs.Count - 2])
+            {
+                var freeSpaceIndex = songs.FindLastIndex((Song song) => song.Uri == null && song.User == userKey);
+                songs.RemoveAt(freeSpaceIndex);
+                Song userSong = new Song()
+                {
+                    User = userKey,
+                    Uri = null
+                };
+                songs[songIndex] = userSong;
+            }
+            else
+            {
+                songs.RemoveAt(songIndex);
+            }
 
             // TODO: I don't really know why this is here ?
             songs.Capacity = songs.Capacity - 1;
