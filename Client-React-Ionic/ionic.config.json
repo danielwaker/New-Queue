@@ -1,0 +1,7 @@
+{
+  "name": "Client-React-Ionic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
