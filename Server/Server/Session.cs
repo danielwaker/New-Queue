@@ -99,7 +99,8 @@ namespace Server
                 Uri = null
             };
             User userInfo = users[user] as User;
-            int userSongCount = userInfo.Songs;
+            // TODO: fix logic so users don't have negative songs lol
+            int userSongCount = userInfo.Songs < 0 ? 0 : userInfo.Songs;
 
             // TODO: what is happening here lol
             int songIndex = (userSongCount + 1) * users.Count + userIndex;
