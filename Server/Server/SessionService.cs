@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,10 @@ namespace Server
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
+
+            var objectSerializer = new ObjectSerializer(x => true);
+            BsonSerializer.RegisterSerializer(objectSerializer);
+
             BsonClassMap.RegisterClassMap<User>();
 
             _session = database.GetCollection<Session>(settings.SessionsCollectionName);
