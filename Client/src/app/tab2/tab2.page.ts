@@ -110,10 +110,17 @@ export class Tab2Page {
   }
 
   async virtualQueue(track: SpotifyApi.TrackObjectFull) {
+    let sessionID = localStorage.getItem(LocalStorageEnum.SessionId);
+    
+    if (sessionID == null) {
+      this.queueUnsuccessfulAlert('User not in a session.');
+      return;
+    }
+
     const headers = this.headers();
     
     const params = {
-      sessionID: localStorage.getItem(LocalStorageEnum.SessionId),
+      sessionID: sessionID,
       user: localStorage.getItem(LocalStorageEnum.User),
       uri: track.id,
       // name: track.name,
@@ -150,17 +157,17 @@ export class Tab2Page {
         });
       }
       else {
-        this.queueAlert();
+        this.queueUnsuccessfulAlert('No devices available');
       }
     });
   }
 
-  async queueAlert() {
-    console.log("No devices available");
+  async queueUnsuccessfulAlert(message: string) {
+    console.log(message);
     const alert = await this.alertController.create({
       cssClass: 'my-custom-class',
       header: 'Queue unsuccessful',
-      message: 'No devices available.',
+      message: message,
       buttons: ['OK']
     });
 
@@ -177,11 +184,13 @@ export class Tab2Page {
     await alert.present();
   }
 
-  headers(): any {
+  private headers(): any {
     const bearer = 'Bearer ' + localStorage.getItem(LocalStorageEnum.Token);
-    const headers = { "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": bearer};
+    const headers = {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": bearer
+    };
 
     return headers;
   }
