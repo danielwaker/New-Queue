@@ -23,7 +23,7 @@ steps:
 - script: |
     npm install -g @angular/cli@15.2.11
     npm install
-    ng build --prod
+    ng build --configuration production
   displayName: 'npm install and build'
   workingDirectory: Client
 
