@@ -128,7 +128,7 @@ export class PlayerComponent implements OnInit {
     console.log("playpause" + playPause);
     console.log(this.playerURL + playPause);
     this.isUserFlippingPlayback = true;
-    this._http.put<any>(this.playerURL + playPause, {}, { headers }).subscribe(() => {
+    this._http.put(this.playerURL + playPause, {}, { headers, responseType: 'text' }).subscribe(() => {
       const params = {
         sessionID: localStorage.getItem(LocalStorageEnum.SessionId)
       };
@@ -140,6 +140,7 @@ export class PlayerComponent implements OnInit {
         this.setCurrentSong();
       }
     }, (error) => {
+      console.log("ERRORRRR", error);
       const flip = (playPause == PlayPause.play) ? PlayPause.pause : PlayPause.play;
       this.paused = (playPause == PlayPause.play) ? false : true;
       this.playPause(flip);

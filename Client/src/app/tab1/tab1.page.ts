@@ -279,14 +279,14 @@ export class Tab1Page {
         uri: this.queue[0][0].uri
       };
       if (!this.player.isPlaying) {
-        this._http.put<any>('https://api.spotify.com/v1/me/player/play', {}, { headers }).subscribe((data) => {
+        this._http.put('https://api.spotify.com/v1/me/player/play', {}, { headers, responseType: 'text'  }).subscribe((data) => {
           this.startQueueUtility(putPlay);
         });
       } else {
         this.startQueueUtility(putPlay);
       }
     } else {
-      this._http.post<any>('https://api.spotify.com/v1/me/player/next', {}, { headers }).subscribe((data) => {
+      this._http.post('https://api.spotify.com/v1/me/player/next', {}, { headers, responseType: 'text'  }).subscribe((data) => {
           this.player.setCurrentSong();
         });
     }
@@ -308,8 +308,8 @@ export class Tab1Page {
         this.removeSong(0);
       });
     } else {
-      this._http.post<any>('https://api.spotify.com/v1/me/player/queue', {}, { params, headers }).subscribe((data) => {
-        this._http.post<any>('https://api.spotify.com/v1/me/player/next', {}, { headers }).subscribe((data) => {
+      this._http.post('https://api.spotify.com/v1/me/player/queue', { }, { params, headers, responseType: 'text' }).subscribe((data) => {
+        this._http.post('https://api.spotify.com/v1/me/player/next', { }, { headers, responseType: 'text'  }).subscribe((data) => {
           console.log("next");
           this.player.setCurrentSong(this.queue[0][0]);
           this.removeSong(0);
